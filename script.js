@@ -74,6 +74,8 @@ const outsideRoutes = {
     "Town Proper-Aleosan": { distance: 5.94, baseRegular: 10.00, baseStudent: 8.00 }
 };
 
+let currentGasPrice = 72.00;
+
 // Gas price tiers based on Ordinance No. 536
 function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
     let multiplier = 1.0;
@@ -107,7 +109,9 @@ function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
 function calculateFare() {
     const origin = document.getElementById("origin").value;
     const destination = document.getElementById("destination").value;
-    const gasPrice = parseFloat(document.getElementById("gasPrice").value);
+    const gasPriceInput = document.getElementById("gasPrice");
+    let gasPrice = gasPriceInput.style.display === 'none' ? currentGasPrice : parseFloat(gasPriceInput.value);
+
     const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
     const hasBaggage = document.getElementById("hasBaggage").checked;
 
@@ -204,10 +208,34 @@ function resetForm() {
     document.getElementById("origin").value = "";
     document.getElementById("destination").value = "";
     document.getElementById("gasPrice").value = "";
+    document.getElementById("gasPrice").style.display = 'none';
+    document.getElementById("currentGasPrice").textContent = `₱${currentGasPrice.toFixed(2)}`;
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("hasBaggage").checked = false;
     document.getElementById("result").classList.remove("show");
     document.getElementById("error").classList.remove("show");
+}
+
+function toggleGasPriceInput() {
+    const gasPriceInput = document.getElementById('gasPrice');
+    const changePriceBtn = document.getElementById('changePriceBtn');
+
+    if (gasPriceInput.style.display === 'none') {
+        gasPriceInput.style.display = 'block';
+        changePriceBtn.textContent = 'Done';
+    } else {
+        const newPrice = parseFloat(gasPriceInput.value);
+        if (!isNaN(newPrice) && newPrice >= 30 && newPrice <= 120) {
+            currentGasPrice = newPrice;
+            document.getElementById('currentGasPrice').textContent = `₱${currentGasPrice.toFixed(2)}`;
+        }
+        gasPriceInput.style.display = 'none';
+        changePriceBtn.textContent = 'Change';
+    }
+}
+
+function updateDestinations() {
+    // No changes needed here for now
 }
 
 // PWA Functionality
@@ -250,6 +278,9 @@ window.addEventListener('appinstalled', () => {
 
 window.addEventListener('load', () => {
     updateOnlineStatus();
+    document.getElementById('changePriceBtn').addEventListener('click', toggleGasPriceInput);
+    document.getElementById('currentGasPrice').textContent = `₱${currentGasPrice.toFixed(2)}`;
+    document.getElementById('gasPrice').value = currentGasPrice;
 });
 
 window.addEventListener('online', updateOnlineStatus);
