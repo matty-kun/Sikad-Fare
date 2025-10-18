@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sikad-fare-v1';
+const CACHE_NAME = 'sikad-fare-v2';
 const urlsToCache = [
   './',
   './index.html',

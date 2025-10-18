@@ -36,11 +36,7 @@
                 <label for="origin">Origin (From)</label>
                 <select id="origin">
                     <option value="">-- Select Origin --</option>
-                    <option value="NDMC">NDMC</option>
-                    <option value="Public Market">Public Market</option>
-                    <option value="Crossing">Crossing</option>
-                    <option value="City Hall">City Hall</option>
-                    <option value="Bus Terminal">Bus Terminal</option>
+                    <option value="Town Proper">Midsayap Town Proper</option>
                 </select>
             </div>
 
@@ -48,17 +44,25 @@
                 <label for="destination">Destination (To)</label>
                 <select id="destination">
                     <option value="">-- Select Destination --</option>
-                    <option value="Public Market">Public Market</option>
-                    <option value="Crossing">Crossing</option>
-                    <option value="City Hall">City Hall</option>
-                    <option value="Bus Terminal">Bus Terminal</option>
-                    <option value="NDMC">NDMC</option>
+                    <option value="Villarica">Villarica/Nalin-Libungan</option>
+                    <option value="Sadaan">Sadaan/Aleosan</option>
+                    <option value="Kimagango">Kimagango/Arizona</option>
+                    <option value="Anonang">Anonang/Barongis</option>
+                    <option value="San Isidro">San Isidro/Lagumbingan</option>
+                    <option value="Bagumba">Bagumba/Damatulan</option>
+                    <option value="Agriculture">Agriculture/Salunayan</option>
+                    <option value="Bual">Bual/Palonoguen</option>
+                    <option value="Glad">Glad/Baliki/Rangeban</option>
+                    <option value="River Side">River Side</option>
+                    <option value="Kiwanan">Kiwanan</option>
+                    <option value="Aleosan">Aleosan</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="gasPrice">Current Gas Price (₱ per liter)</label>
-                <input type="number" id="gasPrice" placeholder="e.g., 72" min="50" max="150" step="0.50">
+                <input type="number" id="gasPrice" placeholder="e.g., 72" min="30" max="120" step="0.50">
+                <p class="helper-text">Enter the current price at the most expensive gas station</p>
             </div>
 
             <div class="form-group">
@@ -66,13 +70,20 @@
                 <div class="passenger-type">
                     <div class="radio-option">
                         <input type="radio" id="student" name="passengerType" value="student" checked>
-                        <label for="student">Student</label>
+                        <label for="student">Student/PWD/Senior</label>
                     </div>
                     <div class="radio-option">
                         <input type="radio" id="regular" name="passengerType" value="regular">
                         <label for="regular">Regular</label>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="hasBaggage">
+                    <span>Add Baggage Fee (₱10.00)</span>
+                </label>
             </div>
 
             <button class="btn" onclick="calculateFare()">Calculate Fare</button>
@@ -88,6 +99,7 @@
                     <p><strong>Distance:</strong> <span id="distanceInfo">-</span> km</p>
                     <p><strong>Passenger Type:</strong> <span id="passengerInfo">-</span></p>
                     <p><strong>Gas Price:</strong> ₱<span id="gasPriceInfo">-</span>/L</p>
+                    <p id="baggageInfo" style="display: none;"><strong>Baggage Fee:</strong> ₱10.00</p>
                 </div>
             </div>
         </div>
