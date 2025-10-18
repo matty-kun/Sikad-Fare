@@ -1,18 +1,77 @@
 // Fare Matrix based on LGU Ordinance No. 536
-// Base fares for first 2km from Midsayap Town Proper
-const fareMatrix = {
-    "Villarica": { distance: 4.30, baseRegular: 10.00, baseStudent: 8.00 },
-    "Sadaan": { distance: 2.60, baseRegular: 10.00, baseStudent: 8.00 },
-    "Kimagango": { distance: 3.73, baseRegular: 10.00, baseStudent: 8.00 },
-    "Anonang": { distance: 4.80, baseRegular: 10.00, baseStudent: 8.00 },
-    "San Isidro": { distance: 1.56, baseRegular: 10.00, baseStudent: 8.00 },
-    "Bagumba": { distance: 2.56, baseRegular: 10.00, baseStudent: 8.00 },
-    "Agriculture": { distance: 1.15, baseRegular: 10.00, baseStudent: 8.00 },
-    "Bual": { distance: 2.45, baseRegular: 10.00, baseStudent: 8.00 },
-    "Glad": { distance: 2.49, baseRegular: 10.00, baseStudent: 8.00 },
-    "River Side": { distance: 6.40, baseRegular: 10.00, baseStudent: 8.00 },
-    "Kiwanan": { distance: 2.83, baseRegular: 10.00, baseStudent: 8.00 },
-    "Aleosan": { distance: 5.94, baseRegular: 10.00, baseStudent: 8.00 }
+
+// WITHIN MIDSAYAP TOWN PROPER (Short routes)
+const townRoutes = {
+    "NDMC-Public Market": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Crossing": { distance: 2.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Town Hall": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Bus Terminal": { distance: 3.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 1": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 2": { distance: 1.2, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 3": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 4": { distance: 1.7, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 5": { distance: 1.9, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 6": { distance: 2.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 7": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "NDMC-Pob 8": { distance: 1.6, baseRegular: 10.00, baseStudent: 8.00 },
+    
+    "Public Market-Crossing": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Town Hall": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Bus Terminal": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 1": { distance: 0.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 2": { distance: 0.7, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 3": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 4": { distance: 1.2, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 5": { distance: 1.4, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 6": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 7": { distance: 1.3, baseRegular: 10.00, baseStudent: 8.00 },
+    "Public Market-Pob 8": { distance: 1.1, baseRegular: 10.00, baseStudent: 8.00 },
+    
+    "Crossing-Town Hall": { distance: 1.2, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Bus Terminal": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 1": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 2": { distance: 1.3, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 3": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 4": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 5": { distance: 0.6, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 6": { distance: 0.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 7": { distance: 0.7, baseRegular: 10.00, baseStudent: 8.00 },
+    "Crossing-Pob 8": { distance: 0.9, baseRegular: 10.00, baseStudent: 8.00 },
+    
+    "Town Hall-Bus Terminal": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 1": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 2": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 3": { distance: 1.3, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 4": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 5": { distance: 1.7, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 6": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 7": { distance: 1.6, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Pob 8": { distance: 1.4, baseRegular: 10.00, baseStudent: 8.00 },
+    
+    "Bus Terminal-Pob 1": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 2": { distance: 2.3, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 3": { distance: 2.0, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 4": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 5": { distance: 1.6, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 6": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 7": { distance: 1.7, baseRegular: 10.00, baseStudent: 8.00 },
+    "Bus Terminal-Pob 8": { distance: 1.9, baseRegular: 10.00, baseStudent: 8.00 },
+};
+
+// FROM TOWN PROPER TO OUTSIDE BARANGAYS
+const outsideRoutes = {
+    "Town Proper-Villarica": { distance: 4.30, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Sadaan": { distance: 2.60, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Kimagango": { distance: 3.73, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Anonang": { distance: 4.80, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-San Isidro": { distance: 1.56, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Bagumba": { distance: 2.56, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Agriculture": { distance: 1.15, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Bual": { distance: 2.45, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Glad": { distance: 2.49, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-River Side": { distance: 6.40, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Kiwanan": { distance: 2.83, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Proper-Aleosan": { distance: 5.94, baseRegular: 10.00, baseStudent: 8.00 }
 };
 
 // Gas price tiers based on Ordinance No. 536
@@ -64,14 +123,40 @@ function calculateFare() {
         showError("Please select a destination.");
         return;
     }
+    if (origin === destination) {
+        showError("Origin and destination cannot be the same.");
+        return;
+    }
     if (!gasPrice || gasPrice < 30 || gasPrice > 120) {
         showError("Please enter a valid gas price (₱30-₱120 per liter).");
         return;
     }
 
-    const route = fareMatrix[destination];
+    // Check if route is within town or outside
+    const routeKey = `${origin}-${destination}`;
+    const reverseRouteKey = `${destination}-${origin}`;
+    
+    let route = townRoutes[routeKey] || townRoutes[reverseRouteKey];
+    
+    // If not found in town routes, check outside routes
     if (!route) {
-        showError("Route not found. Please select a valid destination.");
+        route = outsideRoutes[routeKey] || outsideRoutes[reverseRouteKey];
+    }
+    
+    // If still not found, check if origin is a town location going outside
+    if (!route) {
+        const townLocations = ["NDMC", "Town Hall", "Public Market", "Crossing", "Bus Terminal", 
+                              "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
+        
+        if (townLocations.includes(origin)) {
+            route = outsideRoutes[`Town Proper-${destination}`];
+        } else if (townLocations.includes(destination)) {
+            route = outsideRoutes[`Town Proper-${origin}`];
+        }
+    }
+    
+    if (!route) {
+        showError("Route not found. Please select a valid route.");
         return;
     }
 
