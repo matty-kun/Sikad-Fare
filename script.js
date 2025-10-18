@@ -74,7 +74,7 @@ const outsideRoutes = {
     "Town Proper-Aleosan": { distance: 5.94, baseRegular: 10.00, baseStudent: 8.00 }
 };
 
-let currentGasPrice = 72.00;
+let currentGasPrice = 50;
 
 // Gas price tiers based on Ordinance No. 536
 function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
@@ -131,8 +131,32 @@ function calculateFare() {
         showError("Origin and destination cannot be the same.");
         return;
     }
-    if (!gasPrice || gasPrice < 30 || gasPrice > 120) {
-        showError("Please enter a valid gas price (₱30-₱120 per liter).");
+    if (!gasPrice || gasPrice < 30 || gasPrice > 109) {
+        showError("Please select a valid gas price range.");
+        return;
+    }
+
+    // Handle Poblacion to Poblacion routes
+    if (origin.startsWith('Pob') && destination.startsWith('Pob')) {
+        let fare = passengerType === 'student' ? 12.00 : 15.00;
+        if (hasBaggage) {
+            fare += 10.00;
+        }
+
+        document.getElementById("fareAmount").textContent = fare.toFixed(2);
+        document.getElementById("routeInfo").textContent = `${origin} → ${destination}`;
+        document.getElementById("distanceInfo").textContent = "N/A";
+        document.getElementById("passengerInfo").textContent = passengerType === "student" ? "Student/PWD/Senior" : "Regular";
+        document.getElementById("gasPriceInfo").textContent = "N/A";
+        
+        const baggageInfo = document.getElementById("baggageInfo");
+        if (hasBaggage) {
+            baggageInfo.style.display = "block";
+        } else {
+            baggageInfo.style.display = "none";
+        }
+        
+        document.getElementById("result").classList.add("show");
         return;
     }
 
@@ -207,9 +231,11 @@ function showError(message) {
 function resetForm() {
     document.getElementById("origin").value = "";
     document.getElementById("destination").value = "";
-    document.getElementById("gasPrice").value = "";
-    document.getElementById("gasPrice").style.display = 'none';
-    document.getElementById("currentGasPrice").textContent = `₱${currentGasPrice.toFixed(2)}`;
+    const gasPriceInput = document.getElementById("gasPrice");
+    gasPriceInput.value = "50";
+    gasPriceInput.style.display = 'none';
+    document.getElementById("currentGasPrice").textContent = "50-59";
+    currentGasPrice = 50;
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("hasBaggage").checked = false;
     document.getElementById("result").classList.remove("show");
@@ -225,10 +251,9 @@ function toggleGasPriceInput() {
         changePriceBtn.textContent = 'Done';
     } else {
         const newPrice = parseFloat(gasPriceInput.value);
-        if (!isNaN(newPrice) && newPrice >= 30 && newPrice <= 120) {
-            currentGasPrice = newPrice;
-            document.getElementById('currentGasPrice').textContent = `₱${currentGasPrice.toFixed(2)}`;
-        }
+        currentGasPrice = newPrice;
+        const selectedOption = gasPriceInput.options[gasPriceInput.selectedIndex];
+        document.getElementById('currentGasPrice').textContent = selectedOption.text;
         gasPriceInput.style.display = 'none';
         changePriceBtn.textContent = 'Change';
     }
@@ -279,8 +304,9 @@ window.addEventListener('appinstalled', () => {
 window.addEventListener('load', () => {
     updateOnlineStatus();
     document.getElementById('changePriceBtn').addEventListener('click', toggleGasPriceInput);
-    document.getElementById('currentGasPrice').textContent = `₱${currentGasPrice.toFixed(2)}`;
     document.getElementById('gasPrice').value = currentGasPrice;
+    const selectedOption = document.getElementById('gasPrice').options[document.getElementById('gasPrice').selectedIndex];
+    document.getElementById('currentGasPrice').textContent = selectedOption.text;
 });
 
 window.addEventListener('online', updateOnlineStatus);
