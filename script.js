@@ -2,19 +2,6 @@
 
 // WITHIN MIDSAYAP TOWN PROPER (Short routes)
 const townRoutes = {
-    "NDMC-Public Market": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Crossing": { distance: 2.0, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Town Hall": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Bus Terminal": { distance: 3.0, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 1": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 2": { distance: 1.2, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 3": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 4": { distance: 1.7, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 5": { distance: 1.9, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 6": { distance: 2.0, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 7": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
-    "NDMC-Pob 8": { distance: 1.6, baseRegular: 10.00, baseStudent: 8.00 },
-    
     "Public Market-Crossing": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
     "Public Market-Town Hall": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
     "Public Market-Bus Terminal": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
@@ -26,17 +13,6 @@ const townRoutes = {
     "Public Market-Pob 6": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
     "Public Market-Pob 7": { distance: 1.3, baseRegular: 10.00, baseStudent: 8.00 },
     "Public Market-Pob 8": { distance: 1.1, baseRegular: 10.00, baseStudent: 8.00 },
-    
-    "Crossing-Town Hall": { distance: 1.2, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Bus Terminal": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 1": { distance: 1.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 2": { distance: 1.3, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 3": { distance: 1.0, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 4": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 5": { distance: 0.6, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 6": { distance: 0.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 7": { distance: 0.7, baseRegular: 10.00, baseStudent: 8.00 },
-    "Crossing-Pob 8": { distance: 0.9, baseRegular: 10.00, baseStudent: 8.00 },
     
     "Town Hall-Bus Terminal": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
     "Town Hall-Pob 1": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
