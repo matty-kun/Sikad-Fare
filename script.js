@@ -28,7 +28,7 @@ const baseRoutes = {
 const townRoutes = {
     "Public Market-Town Hall": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
     "Public Market-Bus Terminal": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "Town Hall-Bus Terminal": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
+    "Town Hall-Bus Terminal": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 }
 };
 
 // 🧭 Normalize route names for flexible matching
@@ -36,26 +36,23 @@ function normalizeName(name) {
     if (!name) return "";
     name = name.trim();
 
-    // Normalize Town Proper aliases
     const townProperAliases = ["Town Proper", "Midsayap Proper", "Proper", "Poblacion", "Pob", "Centro"];
     if (townProperAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()))) {
         return "Town Proper";
     }
 
-    // Treat Agriculture and Salunayan as the same
     if (name.toLowerCase().includes("agriculture")) return "Salunayan";
     if (name.toLowerCase().includes("salunayan")) return "Salunayan";
 
-    // Capitalize
     return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 }
 
-// 🔁 Generate bi-directional route entries
+// 🔁 Generate bidirectional route entries
 const outsideRoutes = {};
 Object.entries(baseRoutes).forEach(([key, value]) => {
     outsideRoutes[key] = value;
     const [a, b] = key.split("-");
-    outsideRoutes[`${b}-${a}`] = value; // Reverse direction
+    outsideRoutes[`${b}-${a}`] = value;
 });
 Object.entries(townRoutes).forEach(([key, value]) => {
     townRoutes[key] = value;
@@ -63,7 +60,7 @@ Object.entries(townRoutes).forEach(([key, value]) => {
     townRoutes[`${b}-${a}`] = value;
 });
 
-// 🔍 Route finder (robust)
+// 🔍 Route finder
 function findRoute(origin, destination) {
     origin = normalizeName(origin);
     destination = normalizeName(destination);
@@ -103,8 +100,8 @@ function calculateFare() {
     const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
     const hasBaggage = document.getElementById("hasBaggage").checked;
 
-    let gasPriceInput = document.getElementById("gasPrice");
-    let gasPrice = gasPriceInput.style.display === "none" ? currentGasPrice : parseFloat(gasPriceInput.value);
+    const gasPriceInput = document.getElementById("gasPrice");
+    const gasPrice = gasPriceInput.style.display === "none" ? currentGasPrice : parseFloat(gasPriceInput.value);
 
     document.getElementById("result").classList.remove("show");
     document.getElementById("error").classList.remove("show");
@@ -113,7 +110,7 @@ function calculateFare() {
     if (origin === destination) return showError("Origin and destination cannot be the same.");
     if (gasPrice < 30 || gasPrice > 110) return showError("Please select a valid gas price range.");
 
-    // Poblacion-to-Poblacion flat rate
+    // Flat rate for Poblacion to Poblacion
     if (origin.startsWith("Pob") && destination.startsWith("Pob")) {
         let fare = passengerType === "student" ? 12.00 : 15.00;
         if (hasBaggage) fare += 10.00;
@@ -126,16 +123,12 @@ function calculateFare() {
 
     let fare = getFareByGasPrice(gasPrice, route.baseRegular, route.baseStudent, passengerType);
 
-    if (route.distance > 2 && Object.keys(townRoutes).includes(`${origin}-${destination}`)) {
-        fare += (route.distance - 2) * 2;
-    }
-
     if (hasBaggage) fare += 10;
 
     displayResult(fare, `${origin} → ${destination}`, route.distance, passengerType, gasPrice, hasBaggage);
 }
 
-// 🧾 Show fare
+// 🧾 Display fare result
 function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBaggage) {
     document.getElementById("fareAmount").textContent = fare.toFixed(2);
     document.getElementById("routeInfo").textContent = routeName;
@@ -154,10 +147,10 @@ function showError(msg) {
     err.classList.add("show");
 }
 
-// 🔄 Reset
+// 🔄 Reset form
 function resetForm() {
     document.getElementById("origin").value = "";
-    document.getElementById("destination").value = "";
+    document.getElementById("destination").innerHTML = '<option value="">-- Select Destination --</option>';
     document.getElementById("gasPrice").value = "55";
     document.getElementById("currentGasPrice").textContent = "51–60";
     currentGasPrice = 55;
@@ -167,7 +160,7 @@ function resetForm() {
     document.getElementById("error").classList.remove("show");
 }
 
-// ⛽ Gas price toggle
+// ⛽ Toggle gas price input
 function toggleGasPriceInput() {
     const gasPriceInput = document.getElementById("gasPrice");
     const btn = document.getElementById("changePriceBtn");
@@ -182,6 +175,65 @@ function toggleGasPriceInput() {
         document.getElementById("currentGasPrice").textContent = selectedOption.text;
         gasPriceInput.style.display = "none";
         btn.textContent = "Change";
+    }
+}
+
+// 🧭 Update destination options dynamically
+function updateDestinations() {
+    const originSelect = document.getElementById("origin");
+    const destinationSelect = document.getElementById("destination");
+    const origin = originSelect.value;
+
+    destinationSelect.innerHTML = '<option value="">-- Select Destination --</option>';
+
+    const midsayapProper = [
+        "Town Hall", "Public Market",
+        "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"
+    ];
+
+    const outsideMidsayap = [
+        "Villarica", "Sadaan", "Arizona", "Kimagango", "Rangaban",
+        "Kiwanan", "Aleosan", "Agriculture", "San Isidro", "Damatug",
+        "Anonang", "Barongis", "Libungan Proper", "Palongoguen", "Salunayan",
+        "Bagumba", "Baliki"
+    ];
+
+    const isOriginProper = midsayapProper.includes(origin);
+    const isOriginOutside = outsideMidsayap.includes(origin);
+
+    if (isOriginOutside) {
+        const optGroup = document.createElement("optgroup");
+        optGroup.label = "Within Midsayap Proper";
+        midsayapProper.forEach(place => {
+            const option = document.createElement("option");
+            option.value = place;
+            option.textContent = place;
+            optGroup.appendChild(option);
+        });
+        destinationSelect.appendChild(optGroup);
+    } else if (isOriginProper) {
+        const optGroup1 = document.createElement("optgroup");
+        optGroup1.label = "Within Midsayap Proper";
+        midsayapProper.forEach(place => {
+            if (place !== origin) {
+                const option = document.createElement("option");
+                option.value = place;
+                option.textContent = place;
+                optGroup1.appendChild(option);
+            }
+        });
+
+        const optGroup2 = document.createElement("optgroup");
+        optGroup2.label = "Outside Midsayap Proper";
+        outsideMidsayap.forEach(place => {
+            const option = document.createElement("option");
+            option.value = place;
+            option.textContent = place;
+            optGroup2.appendChild(option);
+        });
+
+        destinationSelect.appendChild(optGroup1);
+        destinationSelect.appendChild(optGroup2);
     }
 }
 
