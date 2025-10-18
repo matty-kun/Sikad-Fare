@@ -85,7 +85,7 @@ function showError(message) {
 function resetForm() {
     document.getElementById("origin").value = "";
     document.getElementById("destination").value = "";
-    document.getElementById("gasPrice").value = "72";
+    document.getElementById("gasPrice").value = "";
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("result").classList.remove("show");
     document.getElementById("error").classList.remove("show");
