@@ -24,20 +24,22 @@ const baseRoutes = {
     "Town Proper-Baliki": { distance: 7.24, baseRegular: 25.00, baseStudent: 20.00 }
 };
 
-// 🏙️ Short routes within Midsayap Town Proper
+// 🏙️ Short routes within Midsayap Proper
 const townRoutes = {
-    "Public Market-Town Hall": { distance: 0.8, baseRegular: 10.00, baseStudent: 8.00 },
-    "Public Market-Bus Terminal": { distance: 2.5, baseRegular: 10.00, baseStudent: 8.00 },
-    "Town Hall-Bus Terminal": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 }
+    "Public Market-Town Hall": { distance: 0.8, baseRegular: 15.00, baseStudent: 12.00 }
 };
 
-// 🧭 Normalize route names for flexible matching
+// 🧭 Normalize names for consistent matching
 function normalizeName(name) {
     if (!name) return "";
     name = name.trim();
 
-    const townProperAliases = ["Town Proper", "Midsayap Proper", "Proper", "Poblacion", "Pob", "Centro"];
-    if (townProperAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()))) {
+    // Treat these as "Town Proper"
+    const properAliases = [
+        "Town Proper", "Midsayap Proper", "Town Hall", "Public Market",
+        "Poblacion", "Pob", "Centro", "Proper"
+    ];
+    if (properAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()))) {
         return "Town Proper";
     }
 
@@ -47,17 +49,17 @@ function normalizeName(name) {
     return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 }
 
-// 🔁 Generate bidirectional route entries
-const outsideRoutes = {};
+// 🔁 Generate bidirectional routes
+const allRoutes = {};
 Object.entries(baseRoutes).forEach(([key, value]) => {
-    outsideRoutes[key] = value;
+    allRoutes[key] = value;
     const [a, b] = key.split("-");
-    outsideRoutes[`${b}-${a}`] = value;
+    allRoutes[`${b}-${a}`] = value;
 });
 Object.entries(townRoutes).forEach(([key, value]) => {
-    townRoutes[key] = value;
+    allRoutes[key] = value;
     const [a, b] = key.split("-");
-    townRoutes[`${b}-${a}`] = value;
+    allRoutes[`${b}-${a}`] = value;
 });
 
 // 🔍 Route finder
@@ -67,20 +69,12 @@ function findRoute(origin, destination) {
 
     const routeKey = `${origin}-${destination}`;
     const reverseKey = `${destination}-${origin}`;
-
-    return (
-        townRoutes[routeKey] ||
-        townRoutes[reverseKey] ||
-        outsideRoutes[routeKey] ||
-        outsideRoutes[reverseKey] ||
-        null
-    );
+    return allRoutes[routeKey] || allRoutes[reverseKey] || null;
 }
 
 // 🔢 Fare multiplier logic
 function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
     let multiplier = 1.0;
-
     if (gasPrice >= 101) multiplier = 1.6;
     else if (gasPrice >= 91) multiplier = 1.5;
     else if (gasPrice >= 81) multiplier = 1.4;
@@ -110,29 +104,35 @@ function calculateFare() {
     if (origin === destination) return showError("Origin and destination cannot be the same.");
     if (gasPrice < 30 || gasPrice > 110) return showError("Please select a valid gas price range.");
 
-    // Flat rate for Poblacion to Poblacion
-    if (origin.startsWith("Pob") && destination.startsWith("Pob")) {
+    // 🎯 Define what counts as "Within Midsayap Proper"
+    const midsayapProper = ["Town Hall", "Public Market", "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
+
+    const isOriginProper = midsayapProper.includes(origin);
+    const isDestinationProper = midsayapProper.includes(destination);
+
+    // 🧮 Flat rate rule for within Midsayap Proper
+    if (isOriginProper && isDestinationProper) {
         let fare = passengerType === "student" ? 12.00 : 15.00;
-        if (hasBaggage) fare += 10.00;
-        displayResult(fare, `${origin} → ${destination}`, "N/A", passengerType, gasPrice, hasBaggage);
+        if (hasBaggage) fare += 10;
+        displayResult(fare, `${origin} → ${destination}`, "Within Town Proper", passengerType, gasPrice, hasBaggage);
         return;
     }
 
+    // 🔍 For all other routes (outside proper)
     const route = findRoute(origin, destination);
     if (!route) return showError("Route not found. Please check your selection.");
 
     let fare = getFareByGasPrice(gasPrice, route.baseRegular, route.baseStudent, passengerType);
-
     if (hasBaggage) fare += 10;
 
     displayResult(fare, `${origin} → ${destination}`, route.distance, passengerType, gasPrice, hasBaggage);
 }
 
-// 🧾 Display fare result
+// 🧾 Show fare
 function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBaggage) {
     document.getElementById("fareAmount").textContent = fare.toFixed(2);
     document.getElementById("routeInfo").textContent = routeName;
-    document.getElementById("distanceInfo").textContent = distance !== "N/A" ? parseFloat(distance).toFixed(2) : "N/A";
+    document.getElementById("distanceInfo").textContent = distance === "Within Town Proper" ? distance : distance ? distance.toFixed(2) : "N/A";
     document.getElementById("passengerInfo").textContent =
         passengerType === "student" ? "Student/PWD/Senior" : "Regular";
     document.getElementById("gasPriceInfo").textContent = gasPrice.toFixed(2);
@@ -140,14 +140,14 @@ function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBa
     document.getElementById("result").classList.add("show");
 }
 
-// ⚠️ Error
+// ⚠️ Error message
 function showError(msg) {
     const err = document.getElementById("error");
     err.textContent = msg;
     err.classList.add("show");
 }
 
-// 🔄 Reset form
+// 🔄 Reset
 function resetForm() {
     document.getElementById("origin").value = "";
     document.getElementById("destination").innerHTML = '<option value="">-- Select Destination --</option>';
@@ -160,7 +160,7 @@ function resetForm() {
     document.getElementById("error").classList.remove("show");
 }
 
-// ⛽ Toggle gas price input
+// ⛽ Gas price toggle
 function toggleGasPriceInput() {
     const gasPriceInput = document.getElementById("gasPrice");
     const btn = document.getElementById("changePriceBtn");
@@ -178,19 +178,13 @@ function toggleGasPriceInput() {
     }
 }
 
-// 🧭 Update destination options dynamically
+// 🧭 Update destination dropdown dynamically
 function updateDestinations() {
-    const originSelect = document.getElementById("origin");
+    const origin = document.getElementById("origin").value;
     const destinationSelect = document.getElementById("destination");
-    const origin = originSelect.value;
-
     destinationSelect.innerHTML = '<option value="">-- Select Destination --</option>';
 
-    const midsayapProper = [
-        "Town Hall", "Public Market",
-        "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"
-    ];
-
+    const midsayapProper = ["Town Hall", "Public Market", "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
     const outsideMidsayap = [
         "Villarica", "Sadaan", "Arizona", "Kimagango", "Rangaban",
         "Kiwanan", "Aleosan", "Agriculture", "San Isidro", "Damatug",
@@ -203,63 +197,59 @@ function updateDestinations() {
 
     if (isOriginOutside) {
         const optGroup = document.createElement("optgroup");
-        optGroup.label = "Within Midsayap Proper";
+        optGroup.label = "Midsayap Proper";
         midsayapProper.forEach(place => {
-            const option = document.createElement("option");
-            option.value = place;
-            option.textContent = place;
-            optGroup.appendChild(option);
+            const opt = document.createElement("option");
+            opt.value = place;
+            opt.textContent = place;
+            optGroup.appendChild(opt);
         });
         destinationSelect.appendChild(optGroup);
     } else if (isOriginProper) {
-        const optGroup1 = document.createElement("optgroup");
-        optGroup1.label = "Within Midsayap Proper";
+        const opt1 = document.createElement("optgroup");
+        opt1.label = "Within Midsayap Proper";
         midsayapProper.forEach(place => {
             if (place !== origin) {
-                const option = document.createElement("option");
-                option.value = place;
-                option.textContent = place;
-                optGroup1.appendChild(option);
+                const opt = document.createElement("option");
+                opt.value = place;
+                opt.textContent = place;
+                opt1.appendChild(opt);
             }
         });
-
-        const optGroup2 = document.createElement("optgroup");
-        optGroup2.label = "Outside Midsayap Proper";
+        const opt2 = document.createElement("optgroup");
+        opt2.label = "Outside Midsayap Proper";
         outsideMidsayap.forEach(place => {
-            const option = document.createElement("option");
-            option.value = place;
-            option.textContent = place;
-            optGroup2.appendChild(option);
+            const opt = document.createElement("option");
+            opt.value = place;
+            opt.textContent = place;
+            opt2.appendChild(opt);
         });
-
-        destinationSelect.appendChild(optGroup1);
-        destinationSelect.appendChild(optGroup2);
+        destinationSelect.appendChild(opt1);
+        destinationSelect.appendChild(opt2);
     }
 }
 
-// 🌐 Online/offline
+// 🌐 Online/offline indicator
 function updateOnlineStatus() {
     const offlineIndicator = document.getElementById("offlineIndicator");
     offlineIndicator.style.display = navigator.onLine ? "none" : "block";
 }
 
-// 📦 PWA install & service worker
+// 📦 PWA setup
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker
-            .register("./sw.js")
+        navigator.serviceWorker.register("./sw.js")
             .then(reg => console.log("Service Worker registered:", reg.scope))
-            .catch(err => console.log("Service Worker registration failed:", err));
+            .catch(err => console.log("SW registration failed:", err));
     });
 }
 
 let deferredPrompt;
-window.addEventListener("beforeinstallprompt", (e) => {
+window.addEventListener("beforeinstallprompt", e => {
     e.preventDefault();
     deferredPrompt = e;
     document.getElementById("installPrompt").style.display = "block";
 });
-
 document.getElementById("installButton").addEventListener("click", async () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -268,17 +258,16 @@ document.getElementById("installButton").addEventListener("click", async () => {
         document.getElementById("installPrompt").style.display = "none";
     }
 });
-
 document.getElementById("dismissButton").addEventListener("click", () => {
     document.getElementById("installPrompt").style.display = "none";
 });
-
 window.addEventListener("appinstalled", () => {
     document.getElementById("installPrompt").style.display = "none";
 });
 
 window.addEventListener("load", () => {
     updateOnlineStatus();
+    document.getElementById("origin").addEventListener("change", updateDestinations);
     document.getElementById("changePriceBtn").addEventListener("click", toggleGasPriceInput);
     document.getElementById("gasPrice").value = currentGasPrice;
     const selectedOption = document.getElementById("gasPrice").options[document.getElementById("gasPrice").selectedIndex];
