@@ -305,3 +305,11 @@ select:focus, input[type="number"]:focus {
         gap: 10px;
     }
 }
+
+.install-prompt ol {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+.install-prompt li {
+    margin: 4px 0;
+}

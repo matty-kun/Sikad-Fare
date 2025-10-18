@@ -4,7 +4,7 @@
 let currentGasPrice = 60; // Default 51–60 range
 
 // 🗺️ Route Matrix (Base Fares at ₱51–60/L)
-const outsideRoutes = {
+const baseRoutes = {
     "Town Proper-Villarica": { distance: 4.3, baseRegular: 21.00, baseStudent: 16.80 },
     "Town Proper-Sadaan": { distance: 3.56, baseRegular: 18.00, baseStudent: 14.76 },
     "Town Proper-Arizona": { distance: 7.63, baseRegular: 27.00, baseStudent: 21.60 },
@@ -13,13 +13,13 @@ const outsideRoutes = {
     "Town Proper-Kiwanan": { distance: 6.46, baseRegular: 18.00, baseStudent: 14.76 },
     "Town Proper-Aleosan": { distance: 9.03, baseRegular: 23.00, baseStudent: 18.86 },
     "Town Proper-Agriculture": { distance: 5.01, baseRegular: 21.00, baseStudent: 16.80 },
+    "Town Proper-Salunayan": { distance: 5.76, baseRegular: 25.00, baseStudent: 20.00 },
     "Town Proper-San Isidro": { distance: 3.63, baseRegular: 21.00, baseStudent: 16.80 },
     "Town Proper-Damatug": { distance: 5.72, baseRegular: 23.00, baseStudent: 18.43 },
     "Town Proper-Anonang": { distance: 8.50, baseRegular: 30.00, baseStudent: 24.00 },
     "Town Proper-Barongis": { distance: 9.57, baseRegular: 32.00, baseStudent: 25.60 },
     "Town Proper-Libungan Proper": { distance: 7.23, baseRegular: 25.00, baseStudent: 21.60 },
     "Town Proper-Palongoguen": { distance: 26.55, baseRegular: 25.00, baseStudent: 20.00 },
-    "Town Proper-salunayan": { distance: 5.76, baseRegular: 25.00, baseStudent: 20.00 },
     "Town Proper-Bagumba": { distance: 4.48, baseRegular: 20.00, baseStudent: 16.80 },
     "Town Proper-Baliki": { distance: 7.24, baseRegular: 25.00, baseStudent: 20.00 }
 };
@@ -31,7 +31,56 @@ const townRoutes = {
     "Town Hall-Bus Terminal": { distance: 1.8, baseRegular: 10.00, baseStudent: 8.00 },
 };
 
-// 🔢 Gas Price Multiplier Logic (relative to ₱51–60 base)
+// 🧭 Normalize route names for flexible matching
+function normalizeName(name) {
+    if (!name) return "";
+    name = name.trim();
+
+    // Normalize Town Proper aliases
+    const townProperAliases = ["Town Proper", "Midsayap Proper", "Proper", "Poblacion", "Pob", "Centro"];
+    if (townProperAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()))) {
+        return "Town Proper";
+    }
+
+    // Treat Agriculture and Salunayan as the same
+    if (name.toLowerCase().includes("agriculture")) return "Salunayan";
+    if (name.toLowerCase().includes("salunayan")) return "Salunayan";
+
+    // Capitalize
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+}
+
+// 🔁 Generate bi-directional route entries
+const outsideRoutes = {};
+Object.entries(baseRoutes).forEach(([key, value]) => {
+    outsideRoutes[key] = value;
+    const [a, b] = key.split("-");
+    outsideRoutes[`${b}-${a}`] = value; // Reverse direction
+});
+Object.entries(townRoutes).forEach(([key, value]) => {
+    townRoutes[key] = value;
+    const [a, b] = key.split("-");
+    townRoutes[`${b}-${a}`] = value;
+});
+
+// 🔍 Route finder (robust)
+function findRoute(origin, destination) {
+    origin = normalizeName(origin);
+    destination = normalizeName(destination);
+
+    const routeKey = `${origin}-${destination}`;
+    const reverseKey = `${destination}-${origin}`;
+
+    return (
+        townRoutes[routeKey] ||
+        townRoutes[reverseKey] ||
+        outsideRoutes[routeKey] ||
+        outsideRoutes[reverseKey] ||
+        null
+    );
+}
+
+// 🔢 Fare multiplier logic
 function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
     let multiplier = 1.0;
 
@@ -47,7 +96,7 @@ function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
     return passengerType === "student" ? baseStudent * multiplier : baseRegular * multiplier;
 }
 
-// 🚲 Fare Calculation Logic
+// 🚲 Fare calculation
 function calculateFare() {
     const origin = document.getElementById("origin").value;
     const destination = document.getElementById("destination").value;
@@ -60,12 +109,11 @@ function calculateFare() {
     document.getElementById("result").classList.remove("show");
     document.getElementById("error").classList.remove("show");
 
-    // Validation
     if (!origin || !destination) return showError("Please select both origin and destination.");
     if (origin === destination) return showError("Origin and destination cannot be the same.");
     if (gasPrice < 30 || gasPrice > 110) return showError("Please select a valid gas price range.");
 
-    // Handle Poblacion-to-Poblacion
+    // Poblacion-to-Poblacion flat rate
     if (origin.startsWith("Pob") && destination.startsWith("Pob")) {
         let fare = passengerType === "student" ? 12.00 : 15.00;
         if (hasBaggage) fare += 10.00;
@@ -73,25 +121,12 @@ function calculateFare() {
         return;
     }
 
-    const routeKey = `${origin}-${destination}`;
-    const reverseKey = `${destination}-${origin}`;
-    let route = townRoutes[routeKey] || townRoutes[reverseKey];
-
-    if (!route) {
-        route =
-            outsideRoutes[routeKey] ||
-            outsideRoutes[reverseKey] ||
-            outsideRoutes[`Town Proper-${destination}`] ||
-            outsideRoutes[`Town Proper-${origin}`];
-    }
-
+    const route = findRoute(origin, destination);
     if (!route) return showError("Route not found. Please check your selection.");
 
-    // Fare computation
     let fare = getFareByGasPrice(gasPrice, route.baseRegular, route.baseStudent, passengerType);
 
-    // Ordinance Rule: +₱2 per km after 2 km (for short routes only)
-    if (route.distance > 2 && Object.keys(townRoutes).includes(routeKey)) {
+    if (route.distance > 2 && Object.keys(townRoutes).includes(`${origin}-${destination}`)) {
         fare += (route.distance - 2) * 2;
     }
 
@@ -100,7 +135,7 @@ function calculateFare() {
     displayResult(fare, `${origin} → ${destination}`, route.distance, passengerType, gasPrice, hasBaggage);
 }
 
-// 🧾 Display the calculated fare
+// 🧾 Show fare
 function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBaggage) {
     document.getElementById("fareAmount").textContent = fare.toFixed(2);
     document.getElementById("routeInfo").textContent = routeName;
@@ -108,21 +143,18 @@ function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBa
     document.getElementById("passengerInfo").textContent =
         passengerType === "student" ? "Student/PWD/Senior" : "Regular";
     document.getElementById("gasPriceInfo").textContent = gasPrice.toFixed(2);
-
-    const baggageInfo = document.getElementById("baggageInfo");
-    baggageInfo.style.display = hasBaggage ? "block" : "none";
-
+    document.getElementById("baggageInfo").style.display = hasBaggage ? "block" : "none";
     document.getElementById("result").classList.add("show");
 }
 
-// ⚠️ Error Display
+// ⚠️ Error
 function showError(msg) {
     const err = document.getElementById("error");
     err.textContent = msg;
     err.classList.add("show");
 }
 
-// 🔄 Reset Form
+// 🔄 Reset
 function resetForm() {
     document.getElementById("origin").value = "";
     document.getElementById("destination").value = "";
@@ -135,7 +167,7 @@ function resetForm() {
     document.getElementById("error").classList.remove("show");
 }
 
-// ⛽ Toggle gas price selector
+// ⛽ Gas price toggle
 function toggleGasPriceInput() {
     const gasPriceInput = document.getElementById("gasPrice");
     const btn = document.getElementById("changePriceBtn");
@@ -153,19 +185,19 @@ function toggleGasPriceInput() {
     }
 }
 
-// 🌐 Online/Offline Status
+// 🌐 Online/offline
 function updateOnlineStatus() {
     const offlineIndicator = document.getElementById("offlineIndicator");
     offlineIndicator.style.display = navigator.onLine ? "none" : "block";
 }
 
-// 📦 PWA Installation and Initialization
+// 📦 PWA install & service worker
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
             .register("./sw.js")
-            .then((reg) => console.log("Service Worker registered:", reg.scope))
-            .catch((err) => console.log("Service Worker registration failed:", err));
+            .then(reg => console.log("Service Worker registered:", reg.scope))
+            .catch(err => console.log("Service Worker registration failed:", err));
     });
 }
 
