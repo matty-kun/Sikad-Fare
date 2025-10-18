@@ -1,0 +1,267 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    border: 2px solid #000;
+}
+
+.header {
+    background: #000000;
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 3px solid #fff;
+}
+
+.header h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.content {
+    padding: 30px 25px;
+}
+
+.install-prompt {
+    background: #000000;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    text-align: center;
+    border: 2px solid #333;
+}
+
+.install-prompt p {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.btn-install {
+    background: white;
+    color: #000;
+    padding: 12px 25px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.3s;
+}
+
+.btn-install:hover {
+    background: #f8f9fa;
+}
+
+.btn-dismiss {
+    background: #333;
+    color: white;
+    padding: 12px 25px;
+    border: 2px solid #666;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-dismiss:hover {
+    background: #444;
+}
+
+.offline-indicator {
+    background: #333;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border: 2px solid #666;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+select, input[type="number"] {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    transition: all 0.3s;
+    background: white;
+    color: #000;
+}
+
+select:focus, input[type="number"]:focus {
+    outline: none;
+    border-color: #000;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+}
+
+.passenger-type {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.radio-option {
+    flex: 1;
+    position: relative;
+}
+
+.radio-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio-option label {
+    display: block;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    margin: 0;
+}
+
+.radio-option input[type="radio"]:checked + label {
+    background: #000;
+    color: white;
+    border-color: #000;
+}
+
+.btn {
+    width: 100%;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    background: #000;
+    border: 2px solid #000;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.btn-reset {
+    background: white;
+    color: #000;
+    border: 2px solid #000;
+}
+
+.btn-reset:hover {
+    background: #f8f9fa;
+}
+
+.result {
+    margin-top: 30px;
+    padding: 30px;
+    background: #000;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    display: none;
+    border: 2px solid #333;
+}
+
+.result.show {
+    display: block;
+}
+
+.result h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.fare-amount {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 20px 0;
+}
+
+.route-details {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.route-details p {
+    margin: 5px 0;
+}
+
+.error {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    display: none;
+    border: 2px solid #cc0000;
+    font-weight: 600;
+}
+
+.error.show {
+    display: block;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .content {
+        padding: 20px 15px;
+    }
+    
+    .fare-amount {
+        font-size: 40px;
+    }
+}

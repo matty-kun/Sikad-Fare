@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Official Sikad/Tricycle Fare Calculator for Midsayap, Cotabato">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Sikad Fare Calculator - Midsayap</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚲 Sikad Fare Calculator</h1>
+            <p>Official Fare Guide - Midsayap, Cotabato</p>
+            <p style="font-size: 12px; margin-top: 5px;">Based on LGU Ordinance No. 536</p>
+        </div>
+
+        <div class="content">
+            <div id="installPrompt" class="install-prompt" style="display: none;">
+                <p>📱 Install this app for offline use!</p>
+                <button id="installButton" class="btn-install">Install App</button>
+                <button id="dismissButton" class="btn-dismiss">Maybe Later</button>
+            </div>
+
+            <div id="offlineIndicator" class="offline-indicator" style="display: none;">
+                📡 You're offline - using cached data
+            </div>
+
+            <div class="form-group">
+                <label for="origin">Origin (From)</label>
+                <select id="origin">
+                    <option value="">-- Select Origin --</option>
+                    <option value="NDMC">NDMC</option>
+                    <option value="Public Market">Public Market</option>
+                    <option value="Crossing">Crossing</option>
+                    <option value="City Hall">City Hall</option>
+                    <option value="Bus Terminal">Bus Terminal</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="destination">Destination (To)</label>
+                <select id="destination">
+                    <option value="">-- Select Destination --</option>
+                    <option value="Public Market">Public Market</option>
+                    <option value="Crossing">Crossing</option>
+                    <option value="City Hall">City Hall</option>
+                    <option value="Bus Terminal">Bus Terminal</option>
+                    <option value="NDMC">NDMC</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="gasPrice">Current Gas Price (₱ per liter)</label>
+                <input type="number" id="gasPrice" placeholder="e.g., 72" min="50" max="150" step="0.50" value="72">
+            </div>
+
+            <div class="form-group">
+                <label>Passenger Type</label>
+                <div class="passenger-type">
+                    <div class="radio-option">
+                        <input type="radio" id="student" name="passengerType" value="student" checked>
+                        <label for="student">Student</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="regular" name="passengerType" value="regular">
+                        <label for="regular">Regular</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="calculateFare()">Calculate Fare</button>
+            <button class="btn btn-reset" onclick="resetForm()">Reset</button>
+
+            <div id="error" class="error"></div>
+
+            <div id="result" class="result">
+                <h2>Your Fare</h2>
+                <div class="fare-amount">₱<span id="fareAmount">0.00</span></div>
+                <div class="route-details">
+                    <p><strong>Route:</strong> <span id="routeInfo">-</span></p>
+                    <p><strong>Distance:</strong> <span id="distanceInfo">-</span> km</p>
+                    <p><strong>Passenger Type:</strong> <span id="passengerInfo">-</span></p>
+                    <p><strong>Gas Price:</strong> ₱<span id="gasPriceInfo">-</span>/L</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
