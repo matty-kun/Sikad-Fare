@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Official Sikad/Tricycle Fare Calculator for Midsayap, Cotabato">
-    <meta name="theme-color" content="#000000">
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Official Sikad/Tricycle Fare Calculator for Midsayap, Cotabato" />
+    <meta name="theme-color" content="#000000" />
+
     <title>Sikad Fare Calculator - Midsayap</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -22,22 +23,26 @@
         </div>
 
         <div class="content">
+            <!-- ✅ PWA Install Prompt -->
             <div id="installPrompt" class="install-prompt" style="display: none;">
                 <p>📱 Install this app for offline use!</p>
                 <button id="installButton" class="btn-install">Install App</button>
                 <button id="dismissButton" class="btn-dismiss">Maybe Later</button>
             </div>
 
+            <!-- ✅ Offline Indicator -->
             <div id="offlineIndicator" class="offline-indicator" style="display: none;">
                 📡 You're offline - using cached data
             </div>
 
+            <!-- ✅ Origin Selector -->
             <div class="form-group">
                 <label for="origin">Origin (From)</label>
                 <select id="origin" onchange="updateDestinations()">
                     <option value="">-- Select Origin --</option>
-                    <optgroup label="Within Midsayap Town">
-                        <option value="Town Hall">Town Hall/Municipal Hall</option>
+
+                    <optgroup label="Within Midsayap Proper">
+                        <option value="Town Hall">Town Hall / Municipal Hall</option>
                         <option value="Public Market">Public Market</option>
                         <option value="Bus Terminal">Bus Terminal</option>
                         <option value="Pob 1">Poblacion 1</option>
@@ -49,28 +54,37 @@
                         <option value="Pob 7">Poblacion 7</option>
                         <option value="Pob 8">Poblacion 8</option>
                     </optgroup>
-                    <optgroup label="Outside Town Proper"> 
-                        <option value="Villarica">Villarica/Nalin-Libungan</option>
-                        <option value="Sadaan">Sadaan/Aleosan</option>
-                        <option value="Kimagango">Kimagango/Arizona</option>
-                        <option value="Anonang">Anonang/Barongis</option>
-                        <option value="San Isidro">San Isidro/Lagumbingan</option>
-                        <option value="Bagumba">Bagumba/Damatulan</option>
-                        <option value="Agriculture">Agriculture/Salunayan</option>
-                        <option value="Bual">Bual/Palonoguen</option>
-                        <option value="River Side">River Side</option>
+
+                    <optgroup label="Outside Midsayap Proper">
+                        <option value="Villarica">Villarica</option>
+                        <option value="Sadaan">Sadaan</option>
+                        <option value="Arizona">Arizona</option>
+                        <option value="Kimagango">Kimagango</option>
+                        <option value="Rangaban">Rangaban</option>
                         <option value="Kiwanan">Kiwanan</option>
                         <option value="Aleosan">Aleosan</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="San Isidro">San Isidro</option>
+                        <option value="Damatug">Damatug</option>
+                        <option value="Anonang">Anonang</option>
+                        <option value="Barongis">Barongis</option>
+                        <option value="Libungan Proper">Libungan Proper</option>
+                        <option value="Palongoguen">Palongoguen</option>
+                        <option value="Salunayan">Salunayan</option>
+                        <option value="Bagumba">Bagumba</option>
+                        <option value="Baliki">Baliki</option>
                     </optgroup>
                 </select>
             </div>
 
+            <!-- ✅ Destination Selector -->
             <div class="form-group">
                 <label for="destination">Destination (To)</label>
                 <select id="destination">
                     <option value="">-- Select Destination --</option>
-                    <optgroup label="Within Midsayap Town">
-                        <option value="Town Hall">Town Hall/Municipal Hall</option>
+
+                    <optgroup label="Within Midsayap Proper">
+                        <option value="Town Hall">Town Hall / Municipal Hall</option>
                         <option value="Public Market">Public Market</option>
                         <option value="Bus Terminal">Bus Terminal</option>
                         <option value="Pob 1">Poblacion 1</option>
@@ -82,67 +96,84 @@
                         <option value="Pob 7">Poblacion 7</option>
                         <option value="Pob 8">Poblacion 8</option>
                     </optgroup>
-                    <optgroup label="Outside Town Proper">
-                        <option value="Villarica">Villarica/Nalin-Libungan</option>
-                        <option value="Sadaan">Sadaan/Aleosan</option>
-                        <option value="Kimagango">Kimagango/Arizona</option>
-                        <option value="Anonang">Anonang/Barongis</option>
-                        <option value="San Isidro">San Isidro/Lagumbingan</option>
-                        <option value="Bagumba">Bagumba/Damatulan</option>
-                        <option value="Agriculture">Agriculture/Salunayan</option>
-                        <option value="Bual">Bual/Palonoguen</option>
-                        <option value="River Side">River Side</option>
+
+                    <optgroup label="Outside Midsayap Proper">
+                        <option value="Villarica">Villarica</option>
+                        <option value="Sadaan">Sadaan</option>
+                        <option value="Arizona">Arizona</option>
+                        <option value="Kimagango">Kimagango</option>
+                        <option value="Rangaban">Rangaban</option>
                         <option value="Kiwanan">Kiwanan</option>
                         <option value="Aleosan">Aleosan</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="San Isidro">San Isidro</option>
+                        <option value="Damatug">Damatug</option>
+                        <option value="Anonang">Anonang</option>
+                        <option value="Barongis">Barongis</option>
+                        <option value="Libungan Proper">Libungan Proper</option>
+                        <option value="Palongoguen">Palongoguen</option>
+                        <option value="Salunayan">Salunayan</option>
+                        <option value="Bagumba">Bagumba</option>
+                        <option value="Baliki">Baliki</option>
                     </optgroup>
                 </select>
             </div>
 
+            <!-- ✅ Gas Price Range Selector -->
             <div class="form-group">
                 <label for="gasPrice">Current Gas Price (₱ per liter)</label>
                 <div class="gas-price-display">
-                    <span id="currentGasPrice">50-59</span>
+                    <span id="currentGasPrice">51–60</span>
                     <button id="changePriceBtn" class="btn-change">Change</button>
                 </div>
+
                 <select id="gasPrice" style="display: none;">
-                    <option value="30">30-39</option>
-                    <option value="40">40-49</option>
-                    <option value="50" selected>50-59</option>
-                    <option value="60">60-69</option>
-                    <option value="70">70-79</option>
-                    <option value="80">80-89</option>
-                    <option value="90">90-99</option>
-                    <option value="100">100-109</option>
+                    <option value="35">30–40</option>
+                    <option value="45">41–50</option>
+                    <option value="55" selected>51–60</option>
+                    <option value="65">61–70</option>
+                    <option value="75">71–80</option>
+                    <option value="85">81–90</option>
+                    <option value="95">91–100</option>
+                    <option value="105">101–110</option>
                 </select>
-                <p class="helper-text">Select the current price range at the most expensive gas station</p>
+
+                <p class="helper-text">
+                    Select the current price range at the most expensive gas station.
+                </p>
             </div>
 
+            <!-- ✅ Passenger Type -->
             <div class="form-group">
                 <label>Passenger Type</label>
                 <div class="passenger-type">
                     <div class="radio-option">
-                        <input type="radio" id="student" name="passengerType" value="student" checked>
-                        <label for="student">Student/PWD/Senior</label>
+                        <input type="radio" id="student" name="passengerType" value="student" checked />
+                        <label for="student">Student / PWD / Senior</label>
                     </div>
                     <div class="radio-option">
-                        <input type="radio" id="regular" name="passengerType" value="regular">
+                        <input type="radio" id="regular" name="passengerType" value="regular" />
                         <label for="regular">Regular</label>
                     </div>
                 </div>
             </div>
 
+            <!-- ✅ Baggage Checkbox -->
             <div class="form-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="hasBaggage">
+                    <input type="checkbox" id="hasBaggage" />
                     <span>Add Baggage Fee (₱10.00)</span>
                 </label>
             </div>
 
+            <!-- ✅ Action Buttons -->
             <button class="btn" onclick="calculateFare()">Calculate Fare</button>
             <button class="btn btn-reset" onclick="resetForm()">Reset</button>
 
+            <!-- ✅ Error Message -->
             <div id="error" class="error"></div>
 
+            <!-- ✅ Fare Result Display -->
             <div id="result" class="result">
                 <h2>Your Fare</h2>
                 <div class="fare-amount">₱<span id="fareAmount">0.00</span></div>
