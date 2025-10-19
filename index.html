@@ -52,7 +52,8 @@
                 <div class="map-card-footer">
                     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                         <button id="setOriginBtn" class="btn" type="button" style="margin-top:6px;">Set Origin by Click</button>
-                        <button id="resetOriginBtn" class="btn btn-reset" type="button" style="margin-top:6px;">Reset Origin to Current</button>
+                        <button id="resetOriginBtn" class="btn btn-reset" type="button" style="margin-top:6px;">Use My Location</button>
+
                         <div class="road-multiplier-container">
                         <label class="road-multiplier-label">
                             <input id="useRoadMultiplier" type="checkbox" />
@@ -73,8 +74,8 @@
                         <p id="mapWarning" style="font-size:12px; color:#aa0000;">Note: This calculates a straight-line distance between points and does not follow roads. Actual travel distance may be ~3–10% longer depending on road curvature and detours.</p>
                     </div>
                     <!-- Action Buttons for Map Mode -->
-                    <button id="confirmDestinationBtn" class="btn" type="button" style="display:none; width:100%; margin-top:16px;">Calculate Fare</button>
-                    <button id="resetMapBtn" class="btn btn-reset" type="button" style="width:100%; margin-top:8px;">Reset Map</button>
+                    <button id="mapCalculateBtn" class="btn" type="button" style="display:none; width:100%; margin-top:16px;">Calculate Fare</button>
+                    <button id="resetMapBtn" class="btn btn-reset" type="button" style="width:100%; margin-top:8px;">Reset</button>
                 </div>
             </div>
 
@@ -214,9 +215,9 @@
             </div>
             <!-- Calculate Fare button is now grouped with the above options -->
             <button id="calculateFareBtn" class="btn" onclick="calculateFare()" style="margin-top: 24px;">Calculate Fare</button>
-
-            <!-- ✅ Reset Button -->
             <button id="resetFormBtn" class="btn btn-reset" onclick="resetForm()">Reset</button>
+
+
 
 
             <!-- ✅ Error Message -->
