@@ -2,6 +2,16 @@
 // Gas Price Tiers: ₱30–40, ₱41–50, ₱51–60, ₱61–70, ₱71–80, ₱81–90, ₱91–100, ₱101–110
 
 let currentGasPrice = 60; // Default 51–60 range
+let currentMode = 'route'; // 'route', 'distance', or 'map'
+let mapInstance = null;
+let userMarker = null;
+let destMarker = null;
+let mapCenter = [7.2320, 124.3650]; // approximate Midsayap, Cotabato
+let setOriginMode = false;
+
+// localStorage keys
+const LS_ORIGIN = 'sikad_map_origin';
+const LS_DEST = 'sikad_map_dest';
 
 // 🗺️ Route Matrix (Base Fares at ₱51–60/L)
 const baseRoutes = {
@@ -33,19 +43,12 @@ const townRoutes = {
 function normalizeName(name) {
     if (!name) return "";
     name = name.trim();
-
-    // Treat these as "Town Proper"
-    const properAliases = [
-        "Town Proper", "Midsayap Proper", "Town Hall", "Public Market",
-        "Poblacion", "Pob", "Centro", "Proper"
-    ];
+    const properAliases = ["Town Proper", "Midsayap Proper", "Town Hall", "Public Market", "Poblacion", "Pob", "Centro", "Proper"];
     if (properAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()))) {
         return "Town Proper";
     }
-
     if (name.toLowerCase().includes("agriculture")) return "Salunayan";
     if (name.toLowerCase().includes("salunayan")) return "Salunayan";
-
     return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 }
 
@@ -66,7 +69,6 @@ Object.entries(townRoutes).forEach(([key, value]) => {
 function findRoute(origin, destination) {
     origin = normalizeName(origin);
     destination = normalizeName(destination);
-
     const routeKey = `${origin}-${destination}`;
     const reverseKey = `${destination}-${origin}`;
     return allRoutes[routeKey] || allRoutes[reverseKey] || null;
@@ -83,34 +85,57 @@ function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
     else if (gasPrice >= 51) multiplier = 1.0;
     else if (gasPrice >= 41) multiplier = 0.9;
     else multiplier = 0.8;
-
     return passengerType === "student" ? baseStudent * multiplier : baseRegular * multiplier;
 }
 
 // 🚲 Fare calculation
 function calculateFare() {
-    const origin = document.getElementById("origin").value;
-    const destination = document.getElementById("destination").value;
-    const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
-    const hasBaggage = document.getElementById("hasBaggage").checked;
-
-    const gasPriceInput = document.getElementById("gasPrice");
-    const gasPrice = gasPriceInput.style.display === "none" ? currentGasPrice : parseFloat(gasPriceInput.value);
-
     document.getElementById("result").classList.remove("show");
     document.getElementById("error").classList.remove("show");
 
-    if (!origin || !destination) return showError("Please select both origin and destination.");
-    if (origin === destination) return showError("Origin and destination cannot be the same.");
+    const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
+    const hasBaggage = document.getElementById("hasBaggage").checked;
+    const gasPriceInput = document.getElementById("gasPrice");
+    const gasPrice = gasPriceInput.style.display === "none" ? currentGasPrice : parseFloat(gasPriceInput.value);
+
     if (gasPrice < 30 || gasPrice > 110) return showError("Please select a valid gas price range.");
 
-    // 🎯 Define what counts as "Within Midsayap Proper"
-    const midsayapProper = ["Town Hall", "Public Market", "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
+    if (currentMode === 'distance') {
+        const km = parseFloat(document.getElementById("customDistance").value);
+        if (!km || km <= 0) return showError("Please enter a valid distance.");
 
+        let ratePerKm = 4.34;
+        if (gasPrice >= 80) ratePerKm *= 1.1;
+        if (gasPrice >= 90) ratePerKm *= 1.2;
+
+        let regularFare = km * ratePerKm;
+        let studentFare = regularFare * 0.8;
+        if (hasBaggage) {
+            regularFare += 10;
+            studentFare += 10;
+        }
+        const primaryFare = passengerType === "student" ? studentFare : regularFare;
+        displayResult(primaryFare, 'Custom Distance', km, passengerType, gasPrice, hasBaggage);
+        document.getElementById('regularFareInfo').textContent = regularFare.toFixed(2);
+        document.getElementById('studentFareInfo').textContent = studentFare.toFixed(2);
+        document.getElementById('rateUsedInfo').textContent = ratePerKm.toFixed(2);
+        document.getElementById('regularFareLine').style.display = 'block';
+        document.getElementById('studentFareLine').style.display = 'block';
+        document.getElementById('rateUsedLine').style.display = 'block';
+        return;
+    }
+
+    // Default to route mode calculation
+    const origin = document.getElementById("origin").value;
+    const destination = document.getElementById("destination").value;
+
+    if (!origin || !destination) return showError("Please select both origin and destination.");
+    if (origin === destination) return showError("Origin and destination cannot be the same.");
+
+    const midsayapProper = ["Town Hall", "Public Market", "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
     const isOriginProper = midsayapProper.includes(origin);
     const isDestinationProper = midsayapProper.includes(destination);
 
-    // 🧮 Flat rate rule for within Midsayap Proper
     if (isOriginProper && isDestinationProper) {
         let fare = passengerType === "student" ? 12.00 : 15.00;
         if (hasBaggage) fare += 10;
@@ -118,13 +143,11 @@ function calculateFare() {
         return;
     }
 
-    // 🔍 For all other routes (outside proper)
     const route = findRoute(origin, destination);
     if (!route) return showError("Route not found. Please check your selection.");
 
     let fare = getFareByGasPrice(gasPrice, route.baseRegular, route.baseStudent, passengerType);
     if (hasBaggage) fare += 10;
-
     displayResult(fare, `${origin} → ${destination}`, route.distance, passengerType, gasPrice, hasBaggage);
 }
 
@@ -133,10 +156,12 @@ function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBa
     document.getElementById("fareAmount").textContent = fare.toFixed(2);
     document.getElementById("routeInfo").textContent = routeName;
     document.getElementById("distanceInfo").textContent = distance === "Within Town Proper" ? distance : distance ? distance.toFixed(2) : "N/A";
-    document.getElementById("passengerInfo").textContent =
-        passengerType === "student" ? "Student/PWD/Senior" : "Regular";
+    document.getElementById("passengerInfo").textContent = passengerType === "student" ? "Student/PWD/Senior" : "Regular";
     document.getElementById("gasPriceInfo").textContent = gasPrice.toFixed(2);
     document.getElementById("baggageInfo").style.display = hasBaggage ? "block" : "none";
+    document.getElementById('regularFareLine').style.display = 'none';
+    document.getElementById('studentFareLine').style.display = 'none';
+    document.getElementById('rateUsedLine').style.display = 'none';
     document.getElementById("result").classList.add("show");
 }
 
@@ -145,6 +170,218 @@ function showError(msg) {
     const err = document.getElementById("error");
     err.textContent = msg;
     err.classList.add("show");
+}
+
+// Central function to control UI mode
+function setMode(newMode) {
+    currentMode = newMode;
+
+    const originContainer = document.getElementById('originContainer');
+    const destinationContainer = document.getElementById('destinationContainer');
+    const distanceInput = document.getElementById('distanceInputContainer');
+    const mapCard = document.getElementById('mapCard');
+    const toggleModeBtn = document.getElementById('toggleModeBtn');
+    const toggleMapBtn = document.getElementById('toggleMapBtn');
+
+    // Hide all mode-specific containers
+    originContainer.style.display = 'none';
+    destinationContainer.style.display = 'none';
+    distanceInput.style.display = 'none';
+    mapCard.style.display = 'none';
+
+    // Show the correct container and update button text
+    switch (currentMode) {
+        case 'route':
+            originContainer.style.display = 'block';
+            destinationContainer.style.display = 'block';
+            toggleModeBtn.textContent = 'Switch to Distance Mode';
+            toggleMapBtn.textContent = 'Switch to Map Mode';
+            break;
+        case 'distance':
+            distanceInput.style.display = 'block';
+            toggleModeBtn.textContent = 'Switch to Route Mode';
+            toggleMapBtn.textContent = 'Switch to Map Mode';
+            break;
+        case 'map':
+            mapCard.style.display = 'block';
+            toggleModeBtn.textContent = 'Switch to Distance Mode';
+            toggleMapBtn.textContent = 'Switch to Route Mode';
+            if (!mapInstance) initMap();
+            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 10);
+            break;
+    }
+    document.getElementById("result").classList.remove("show");
+    document.getElementById("error").classList.remove("show");
+}
+
+// Toggle to Distance Mode or back to Route Mode
+function toggleMode() {
+    const newMode = currentMode === 'distance' ? 'route' : 'distance';
+    setMode(newMode);
+}
+
+// Toggle to Map Mode or back to Route Mode
+function toggleMapMode() {
+    const newMode = currentMode === 'map' ? 'route' : 'map';
+    setMode(newMode);
+}
+
+// Initialize Leaflet map
+function initMap() {
+    mapInstance = L.map('map').setView(mapCenter, 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(mapInstance);
+    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            mapInstance.setView([lat, lng], 13);
+            if (userMarker) userMarker.setLatLng([lat, lng]);
+            else userMarker = L.marker([lat, lng], { draggable: true }).addTo(mapInstance).bindPopup('You are here').openPopup();
+        }, () => {
+            if (!userMarker) userMarker = L.marker(mapCenter).addTo(mapInstance).bindPopup('Default location');
+        });
+    } else {
+        userMarker = L.marker(mapCenter).addTo(mapInstance).bindPopup('Location unavailable');
+    }
+
+    mapInstance.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        if (setOriginMode) {
+            if (userMarker) userMarker.setLatLng([lat, lng]);
+            else userMarker = L.marker([lat, lng], { draggable: true }).addTo(mapInstance).bindPopup('Origin (you)').openPopup();
+            localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat, lng }));
+            userMarker.on('dragend', () => {
+                if (destMarker) {
+                    const a = userMarker.getLatLng();
+                    const b = destMarker.getLatLng();
+                    const d = haversineDistance(a.lat, a.lng, b.lat, b.lng);
+                    localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat: a.lat, lng: a.lng }));
+                    computeMapFareAndShow(d);
+                }
+            });
+            setOriginMode = false;
+            document.getElementById('setOriginBtn').textContent = 'Set Origin by Click';
+            return;
+        }
+        if (destMarker) destMarker.setLatLng([lat, lng]);
+        else destMarker = L.marker([lat, lng]).addTo(mapInstance).bindPopup('Destination').openPopup();
+        localStorage.setItem(LS_DEST, JSON.stringify({ lat, lng }));
+        document.getElementById('confirmDestinationBtn').style.display = 'block';
+        const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
+        const distKm = haversineDistance(originLatLng.lat, originLatLng.lng, lat, lng);
+        computeMapFareAndShow(distKm);
+    });
+
+    document.getElementById('confirmDestinationBtn').addEventListener('click', () => {
+        if (!destMarker) return showError('Please select a destination on the map first.');
+        const destLatLng = destMarker.getLatLng();
+        const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
+        const distKm = haversineDistance(originLatLng.lat, originLatLng.lng, destLatLng.lat, destLatLng.lng);
+        computeMapFareAndShow(distKm);
+    });
+
+    document.getElementById('setOriginBtn').addEventListener('click', () => {
+        setOriginMode = !setOriginMode;
+        setOriginBtn.textContent = setOriginMode ? 'Click map to set Origin (tap again to cancel)' : 'Set Origin by Click';
+    });
+
+    document.getElementById('resetOriginBtn').addEventListener('click', () => {
+        if (!mapInstance) return;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                if (userMarker) userMarker.setLatLng([lat, lng]);
+                else userMarker = L.marker([lat, lng], { draggable: true }).addTo(mapInstance).bindPopup('You are here').openPopup();
+                localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat, lng }));
+                mapInstance.setView([lat, lng], 13);
+            }, () => showError('Unable to get current location.'));
+        } else {
+            showError('Geolocation not supported in your browser.');
+        }
+    });
+
+    try {
+        const savedOrigin = JSON.parse(localStorage.getItem(LS_ORIGIN));
+        if (savedOrigin && savedOrigin.lat && savedOrigin.lng) {
+            if (userMarker) userMarker.setLatLng([savedOrigin.lat, savedOrigin.lng]);
+            else userMarker = L.marker([savedOrigin.lat, savedOrigin.lng], { draggable: true }).addTo(mapInstance).bindPopup('Origin (saved)');
+            userMarker.on('dragend', () => {
+                if (destMarker) {
+                    const a = userMarker.getLatLng();
+                    const b = destMarker.getLatLng();
+                    const d = haversineDistance(a.lat, a.lng, b.lat, b.lng);
+                    localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat: a.lat, lng: a.lng }));
+                    computeMapFareAndShow(d);
+                }
+            });
+        }
+        const savedDest = JSON.parse(localStorage.getItem(LS_DEST));
+        if (savedDest && savedDest.lat && savedDest.lng) {
+            if (destMarker) destMarker.setLatLng([savedDest.lat, savedDest.lng]);
+            else destMarker = L.marker([savedDest.lat, savedDest.lng]).addTo(mapInstance).bindPopup('Destination (saved)');
+            if (userMarker) {
+                const d = haversineDistance(userMarker.getLatLng().lat, userMarker.getLatLng().lng, savedDest.lat, savedDest.lng);
+                computeMapFareAndShow(d);
+            }
+        }
+    } catch (e) { /* ignore */ }
+}
+
+// Haversine formula (returns distance in km)
+function haversineDistance(lat1, lon1, lat2, lon2) {
+    function toRad(x) { return x * Math.PI / 180; }
+    const R = 6371; // km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+function computeMapFareAndShow(distKm) {
+    const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
+    const hasBaggage = document.getElementById('hasBaggage').checked;
+    const gasPriceElem = document.getElementById('gasPrice');
+    const gasPrice = gasPriceElem.style.display === 'none' ? currentGasPrice : parseFloat(gasPriceElem.value);
+
+    let ratePerKm = 4.34;
+    if (gasPrice >= 80) ratePerKm *= 1.1;
+    if (gasPrice >= 90) ratePerKm *= 1.2;
+
+    let regularFare = distKm * ratePerKm;
+    let studentFare = regularFare * 0.8;
+    if (hasBaggage) { regularFare += 10; studentFare += 10; }
+
+    const useRoad = document.getElementById('useRoadMultiplier').checked;
+    const roadMultInput = document.getElementById('roadMultiplier');
+    let usedMult = 1.0;
+    if (useRoad && roadMultInput) {
+        const m = parseFloat(roadMultInput.value);
+        if (!isNaN(m) && m > 0) {
+            usedMult = m;
+            regularFare *= usedMult;
+            studentFare *= usedMult;
+        }
+    }
+    const primaryFare = passengerType === 'student' ? studentFare : regularFare;
+
+    document.getElementById('mapDistance').textContent = `Distance: ${distKm.toFixed(2)} km`;
+    document.getElementById('mapFare').textContent = `Estimated Fare: ₱${primaryFare.toFixed(2)}`;
+    document.getElementById('mapRateUsed').style.display = 'block';
+    document.getElementById('mapRateUsed').textContent = `Rate Used: ₱${ratePerKm.toFixed(2)} /km`;
+    document.getElementById('mapCalcNote').style.display = 'block';
+    document.getElementById('mapCalcNote').textContent = useRoad ? `Calculation: base ₱4.34/km with gas/discounts and road multiplier x${usedMult.toFixed(2)} applied.` : 'Calculation: base ₱4.34/km with gas adjustments and discounts applied.';
+    document.getElementById('mapRoadEstimate').style.display = 'block';
+    document.getElementById('mapRoadEstimate').textContent = `Estimated road distance: ${(distKm * 1.03).toFixed(2)} - ${(distKm * 1.10).toFixed(2)} km (approx.)`;
+    document.getElementById('mapWarning').style.display = 'block';
+
+    displayResult(primaryFare, 'Map Route', distKm, passengerType, gasPrice, hasBaggage);
 }
 
 // 🔄 Reset
@@ -156,15 +393,13 @@ function resetForm() {
     currentGasPrice = 55;
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("hasBaggage").checked = false;
-    document.getElementById("result").classList.remove("show");
-    document.getElementById("error").classList.remove("show");
+    setMode('route'); // Reset to default route mode
 }
 
 // ⛽ Gas price toggle
 function toggleGasPriceInput() {
     const gasPriceInput = document.getElementById("gasPrice");
     const btn = document.getElementById("changePriceBtn");
-
     if (gasPriceInput.style.display === "none") {
         gasPriceInput.style.display = "block";
         btn.textContent = "Done";
@@ -183,15 +418,8 @@ function updateDestinations() {
     const origin = document.getElementById("origin").value;
     const destinationSelect = document.getElementById("destination");
     destinationSelect.innerHTML = '<option value="">-- Select Destination --</option>';
-
     const midsayapProper = ["Town Hall", "Public Market", "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
-    const outsideMidsayap = [
-        "Villarica", "Sadaan", "Arizona", "Kimagango", "Rangaban",
-        "Kiwanan", "Aleosan", "Agriculture", "San Isidro", "Damatug",
-        "Anonang", "Barongis", "Libungan Proper", "Palongoguen", "Salunayan",
-        "Bagumba", "Baliki"
-    ];
-
+    const outsideMidsayap = ["Villarica", "Sadaan", "Arizona", "Kimagango", "Rangaban", "Kiwanan", "Aleosan", "Agriculture", "San Isidro", "Damatug", "Anonang", "Barongis", "Libungan Proper", "Palongoguen", "Salunayan", "Bagumba", "Baliki"];
     const isOriginProper = midsayapProper.includes(origin);
     const isOriginOutside = outsideMidsayap.includes(origin);
 
@@ -231,8 +459,7 @@ function updateDestinations() {
 
 // 🌐 Online/offline indicator
 function updateOnlineStatus() {
-    const offlineIndicator = document.getElementById("offlineIndicator");
-    offlineIndicator.style.display = navigator.onLine ? "none" : "block";
+    document.getElementById("offlineIndicator").style.display = navigator.onLine ? "none" : "block";
 }
 
 // 📦 PWA setup
@@ -243,7 +470,6 @@ if ("serviceWorker" in navigator) {
             .catch(err => console.log("SW registration failed:", err));
     });
 }
-
 let deferredPrompt;
 window.addEventListener("beforeinstallprompt", e => {
     e.preventDefault();
@@ -265,13 +491,14 @@ window.addEventListener("appinstalled", () => {
     document.getElementById("installPrompt").style.display = "none";
 });
 
+// Initial setup on window load
 window.addEventListener("load", () => {
     updateOnlineStatus();
     document.getElementById("origin").addEventListener("change", updateDestinations);
     document.getElementById("changePriceBtn").addEventListener("click", toggleGasPriceInput);
-    document.getElementById("gasPrice").value = currentGasPrice;
     const selectedOption = document.getElementById("gasPrice").options[document.getElementById("gasPrice").selectedIndex];
     document.getElementById("currentGasPrice").textContent = selectedOption.text;
+    setMode('route'); // Initialize the UI to the default route mode
 });
 
 window.addEventListener("online", updateOnlineStatus);
