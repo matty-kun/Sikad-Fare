@@ -251,10 +251,17 @@ select:focus, input[type="number"]:focus {
     border: 1px solid #333;
 }
 .install-prompt p { margin-bottom: 16px; }
+
+.install-prompt-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap; /* Allows buttons to stack on very small screens */
+}
+
 .install-prompt .btn-install, .install-prompt .btn-dismiss {
     width: auto;
     padding: 10px 24px;
-    margin: 0 8px;
 }
 
 .offline-indicator {
