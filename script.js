@@ -236,8 +236,6 @@ function initMap() {
         if (destMarker) destMarker.setLatLng([lat, lng]);
         else destMarker = L.marker([lat, lng]).addTo(mapInstance).bindPopup('Destination').openPopup();
         localStorage.setItem(LS_DEST, JSON.stringify({ lat, lng }));
-        document.getElementById('mapCalculateBtn').style.display = 'block';
-        document.getElementById('mapCalculateBtn').style.display = 'block'; // Show the button
     });
 
 
@@ -298,7 +296,6 @@ function initMap() {
             if (destMarker) destMarker.setLatLng([savedDest.lat, savedDest.lng]);
             else destMarker = L.marker([savedDest.lat, savedDest.lng]).addTo(mapInstance).bindPopup('Destination (saved)');
             if (userMarker) {
-                document.getElementById('mapCalculateBtn').style.display = 'block'; // Show button if loading saved dest
                 const d = haversineDistance(userMarker.getLatLng().lat, userMarker.getLatLng().lng, savedDest.lat, savedDest.lng);
                 computeMapFareAndShow(d);
             }
@@ -375,7 +372,6 @@ function resetForm() {
         destMarker.remove();
         destMarker = null;
     }
-    document.getElementById('mapCalculateBtn').style.display = 'none'; // Hide button on reset
     localStorage.removeItem(LS_DEST); // Clear saved destination
 
     // Do not reset the mode, just clear inputs and results
