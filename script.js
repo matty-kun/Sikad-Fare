@@ -89,67 +89,7 @@ function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
 }
 
 // 🚲 Fare calculation
-function calculateFare() {
-    document.getElementById("result").classList.remove("show");
-    document.getElementById("error").classList.remove("show");
 
-    const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
-    const hasBaggage = document.getElementById("hasBaggage").checked;
-    const gasPriceInput = document.getElementById("gasPrice");
-    const gasPrice = gasPriceInput.style.display === "none" ? currentGasPrice : parseFloat(gasPriceInput.value);
-
-    if (gasPrice < 30 || gasPrice > 110) return showError("Please select a valid gas price range.");
-
-    if (currentMode === 'distance') {
-        const km = parseFloat(document.getElementById("customDistance").value);
-        if (!km || km <= 0) return showError("Please enter a valid distance.");
-
-        let ratePerKm = 4.34;
-        if (gasPrice >= 80) ratePerKm *= 1.1;
-        if (gasPrice >= 90) ratePerKm *= 1.2;
-
-        let regularFare = km * ratePerKm;
-        let studentFare = regularFare * 0.8;
-        if (hasBaggage) {
-            regularFare += 10;
-            studentFare += 10;
-        }
-        const primaryFare = passengerType === "student" ? studentFare : regularFare;
-        displayResult(primaryFare, 'Custom Distance', km, passengerType, gasPrice, hasBaggage);
-        document.getElementById('regularFareInfo').textContent = regularFare.toFixed(2);
-        document.getElementById('studentFareInfo').textContent = studentFare.toFixed(2);
-        document.getElementById('rateUsedInfo').textContent = ratePerKm.toFixed(2);
-        document.getElementById('regularFareLine').style.display = 'block';
-        document.getElementById('studentFareLine').style.display = 'block';
-        document.getElementById('rateUsedLine').style.display = 'block';
-        return;
-    }
-
-    // Default to route mode calculation
-    const origin = document.getElementById("origin").value;
-    const destination = document.getElementById("destination").value;
-
-    if (!origin || !destination) return showError("Please select both origin and destination.");
-    if (origin === destination) return showError("Origin and destination cannot be the same.");
-
-    const midsayapProper = ["Town Hall", "Public Market", "Pob 1", "Pob 2", "Pob 3", "Pob 4", "Pob 5", "Pob 6", "Pob 7", "Pob 8"];
-    const isOriginProper = midsayapProper.includes(origin);
-    const isDestinationProper = midsayapProper.includes(destination);
-
-    if (isOriginProper && isDestinationProper) {
-        let fare = passengerType === "student" ? 12.00 : 15.00;
-        if (hasBaggage) fare += 10;
-        displayResult(fare, `${origin} → ${destination}`, "Within Town Proper", passengerType, gasPrice, hasBaggage);
-        return;
-    }
-
-    const route = findRoute(origin, destination);
-    if (!route) return showError("Route not found. Please check your selection.");
-
-    let fare = getFareByGasPrice(gasPrice, route.baseRegular, route.baseStudent, passengerType);
-    if (hasBaggage) fare += 10;
-    displayResult(fare, `${origin} → ${destination}`, route.distance, passengerType, gasPrice, hasBaggage);
-}
 
 // 🧾 Show fare
 function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBaggage) {
@@ -159,9 +99,6 @@ function displayResult(fare, routeName, distance, passengerType, gasPrice, hasBa
     document.getElementById("passengerInfo").textContent = passengerType === "student" ? "Student/PWD/Senior" : "Regular";
     document.getElementById("gasPriceInfo").textContent = gasPrice.toFixed(2);
     document.getElementById("baggageInfo").style.display = hasBaggage ? "block" : "none";
-    document.getElementById('regularFareLine').style.display = 'none';
-    document.getElementById('studentFareLine').style.display = 'none';
-    document.getElementById('rateUsedLine').style.display = 'none';
     document.getElementById("result").classList.add("show");
 }
 
@@ -171,6 +108,8 @@ function showError(msg) {
     err.textContent = msg;
     err.classList.add("show");
 }
+
+
 
 // Central function to control UI mode
 function setMode(newMode) {
@@ -182,17 +121,12 @@ function setMode(newMode) {
     const mapCard = document.getElementById('mapCard');
     const toggleModeBtn = document.getElementById('toggleModeBtn');
     const toggleMapBtn = document.getElementById('toggleMapBtn');
-    const mainButtons = [
-        document.getElementById('calculateFareBtn'),
-        document.getElementById('resetFormBtn')
-    ];
 
     // Hide all mode-specific containers
     originContainer.style.display = 'none';
     destinationContainer.style.display = 'none';
     distanceInput.style.display = 'none';
     mapCard.style.display = 'none';
-    mainButtons.forEach(btn => btn.style.display = 'block'); // Default to visible
 
     // Show the correct container and update button text
     switch (currentMode) {
@@ -201,11 +135,15 @@ function setMode(newMode) {
             destinationContainer.style.display = 'block';
             toggleModeBtn.textContent = 'Distance Mode';
             toggleMapBtn.textContent = 'Map Mode';
+            document.getElementById('calculateFareBtn').style.display = 'inline-block';
+            document.getElementById('resetFormBtn').style.display = 'inline-block';
             break;
         case 'distance':
             distanceInput.style.display = 'block';
             toggleModeBtn.textContent = 'Route Mode';
             toggleMapBtn.textContent = 'Map Mode';
+            document.getElementById('calculateFareBtn').style.display = 'inline-block';
+            document.getElementById('resetFormBtn').style.display = 'inline-block';
             break;
         case 'map':
             mapCard.style.display = 'block';
@@ -213,11 +151,13 @@ function setMode(newMode) {
             toggleMapBtn.textContent = 'Route Mode';
             if (!mapInstance) initMap();
             setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 10);
-            mainButtons.forEach(btn => btn.style.display = 'none');
+            document.getElementById('calculateFareBtn').style.display = 'none';
+            document.getElementById('resetFormBtn').style.display = 'none';
+            // Ensure map-specific buttons are managed
+            document.getElementById('resetMapBtn').style.display = 'block';
             break;
     }
     document.getElementById("result").classList.remove("show");
-    document.getElementById("error").classList.remove("show");
 }
 
 // Toggle to Distance Mode or back to Route Mode
@@ -255,6 +195,23 @@ function initMap() {
         userMarker = L.marker(mapCenter).addTo(mapInstance).bindPopup('Location unavailable');
     }
 
+
+    document.getElementById('setOriginBtn').addEventListener('click', () => {
+        setOriginMode = !setOriginMode; // Toggle the mode
+        const btn = document.getElementById('setOriginBtn');
+        if (setOriginMode) {
+            btn.textContent = 'Click map to set Origin (tap again to cancel)';
+            btn.style.background = '#ffc107'; // Highlight color
+            btn.style.borderColor = '#ffc107';
+        } else {
+            btn.textContent = 'Set Origin by Click';
+            btn.style.background = ''; // Revert to default style
+            btn.style.borderColor = '';
+        }
+    });
+
+
+
     mapInstance.on('click', function(e) {
         const { lat, lng } = e.latlng;
         if (setOriginMode) {
@@ -272,29 +229,32 @@ function initMap() {
             });
             setOriginMode = false;
             document.getElementById('setOriginBtn').textContent = 'Set Origin by Click';
+            document.getElementById('setOriginBtn').style.background = '';
+            document.getElementById('setOriginBtn').style.borderColor = '';
             return;
         }
         if (destMarker) destMarker.setLatLng([lat, lng]);
         else destMarker = L.marker([lat, lng]).addTo(mapInstance).bindPopup('Destination').openPopup();
         localStorage.setItem(LS_DEST, JSON.stringify({ lat, lng }));
-        const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
-        document.getElementById('confirmDestinationBtn').style.display = 'block'; // Show the button
+        document.getElementById('mapCalculateBtn').style.display = 'block';
+        document.getElementById('mapCalculateBtn').style.display = 'block'; // Show the button
     });
 
-    document.getElementById('confirmDestinationBtn').addEventListener('click', () => {
-        if (!destMarker) return showError('Please select a destination on the map first.');
+
+
+    document.getElementById('mapCalculateBtn').addEventListener('click', () => {
+        if (!destMarker) {
+            return showError('Please set a destination on the map first.');
+        }
         const destLatLng = destMarker.getLatLng();
         const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
         const distKm = haversineDistance(originLatLng.lat, originLatLng.lng, destLatLng.lat, destLatLng.lng);
         computeMapFareAndShow(distKm);
     });
 
-    document.getElementById('setOriginBtn').addEventListener('click', () => {
-        setOriginMode = !setOriginMode;
-        setOriginBtn.textContent = setOriginMode ? 'Click map to set Origin (tap again to cancel)' : 'Set Origin by Click';
-    });
 
     document.getElementById('resetMapBtn').addEventListener('click', () => {
+        document.getElementById("error").classList.remove("show");
         resetForm(); // The main reset function already handles map state
         showError('Map has been reset.'); // Provide user feedback
     });
@@ -303,15 +263,18 @@ function initMap() {
         if (!mapInstance) return;
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                if (userMarker) userMarker.setLatLng([lat, lng]);
-                else userMarker = L.marker([lat, lng], { draggable: true }).addTo(mapInstance).bindPopup('You are here').openPopup();
-                localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat, lng }));
-                mapInstance.setView([lat, lng], 13);
-            }, () => showError('Unable to get current location.'));
+                const { latitude, longitude } = pos.coords;
+                if (userMarker) {
+                    userMarker.setLatLng([latitude, longitude]);
+                    mapInstance.setView([latitude, longitude], 14); // Center view on user
+                    localStorage.removeItem(LS_ORIGIN); // Remove manual origin override
+                    showError("Origin reset to your current location.");
+                }
+            }, () => {
+                showError("Could not get your location. Please enable location services.");
+            });
         } else {
-            showError('Geolocation not supported in your browser.');
+            showError("Geolocation is not supported by your browser.");
         }
     });
 
@@ -335,8 +298,8 @@ function initMap() {
             if (destMarker) destMarker.setLatLng([savedDest.lat, savedDest.lng]);
             else destMarker = L.marker([savedDest.lat, savedDest.lng]).addTo(mapInstance).bindPopup('Destination (saved)');
             if (userMarker) {
+                document.getElementById('mapCalculateBtn').style.display = 'block'; // Show button if loading saved dest
                 const d = haversineDistance(userMarker.getLatLng().lat, userMarker.getLatLng().lng, savedDest.lat, savedDest.lng);
-                document.getElementById('confirmDestinationBtn').style.display = 'block';
                 computeMapFareAndShow(d);
             }
         }
@@ -412,12 +375,11 @@ function resetForm() {
         destMarker.remove();
         destMarker = null;
     }
+    document.getElementById('mapCalculateBtn').style.display = 'none'; // Hide button on reset
     localStorage.removeItem(LS_DEST); // Clear saved destination
-    document.getElementById('confirmDestinationBtn').style.display = 'none';
 
     // Do not reset the mode, just clear inputs and results
     document.getElementById("result").classList.remove("show");
-    document.getElementById("error").classList.remove("show");
 }
 
 // ⛽ Gas price toggle
@@ -523,6 +485,23 @@ window.addEventListener("load", () => {
     const selectedOption = document.getElementById("gasPrice").options[document.getElementById("gasPrice").selectedIndex];
     document.getElementById("currentGasPrice").textContent = selectedOption.text;
     setMode('route'); // Initialize the UI to the default route mode
+
+    // Hide error on interaction
+    const errorHidingElements = [
+        'origin',
+        'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage',
+        'changePriceBtn'
+    ]; // This array seems unused, can be removed later.
+    const elements = ['toggleModeBtn', 'toggleMapModeBtn', 'changePriceBtn', 'origin', 'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage', 'calculateMapFareBtn', 'resetMapBtn'];
+    elements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            const event = (el.tagName === 'SELECT' || el.type === 'text' || el.type === 'number') ? 'input' : 'click';
+            el.addEventListener(event, () => {
+                document.getElementById("error").classList.remove("show");
+            });
+        }
+    });
 });
 
 window.addEventListener("online", updateOnlineStatus);
