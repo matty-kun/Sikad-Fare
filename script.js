@@ -182,16 +182,16 @@ function setMode(newMode) {
     const mapCard = document.getElementById('mapCard');
     const toggleModeBtn = document.getElementById('toggleModeBtn');
     const toggleMapBtn = document.getElementById('toggleMapBtn');
-    const calculateFareBtn = document.getElementById('calculateFareBtn');
-    const resetFormBtn = document.getElementById('resetFormBtn');
+    const mainButtons = [
+        document.getElementById('calculateFareBtn'),
+        document.getElementById('resetFormBtn')
+    ];
 
     // Hide all mode-specific containers
     originContainer.style.display = 'none';
     destinationContainer.style.display = 'none';
-    distanceInput.style.display = 'none';
     mapCard.style.display = 'none';
-    calculateFareBtn.style.display = 'block'; // Default to visible
-    resetFormBtn.style.display = 'block';     // Default to visible
+    mainButtons.forEach(btn => btn.style.display = 'block'); // Default to visible
 
     // Show the correct container and update button text
     switch (currentMode) {
@@ -202,7 +202,6 @@ function setMode(newMode) {
             toggleMapBtn.textContent = 'Map Mode';
             break;
         case 'distance':
-            distanceInput.style.display = 'block';
             toggleModeBtn.textContent = 'Route Mode';
             toggleMapBtn.textContent = 'Map Mode';
             break;
@@ -212,8 +211,7 @@ function setMode(newMode) {
             toggleMapBtn.textContent = 'Route Mode';
             if (!mapInstance) initMap();
             setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 10);
-            calculateFareBtn.style.display = 'none';
-            resetFormBtn.style.display = 'none';
+            mainButtons.forEach(btn => btn.style.display = 'none');
             break;
     }
     document.getElementById("result").classList.remove("show");
@@ -294,6 +292,11 @@ function initMap() {
     document.getElementById('setOriginBtn').addEventListener('click', () => {
         setOriginMode = !setOriginMode;
         setOriginBtn.textContent = setOriginMode ? 'Click map to set Origin (tap again to cancel)' : 'Set Origin by Click';
+    });
+
+    document.getElementById('resetMapBtn').addEventListener('click', () => {
+        resetForm(); // The main reset function already handles map state
+        showError('Map has been reset.'); // Provide user feedback
     });
 
     document.getElementById('resetOriginBtn').addEventListener('click', () => {
@@ -409,6 +412,7 @@ function resetForm() {
         destMarker.remove();
         destMarker = null;
     }
+    localStorage.removeItem(LS_DEST); // Clear saved destination
     document.getElementById('confirmDestinationBtn').style.display = 'none';
 
     // Do not reset the mode, just clear inputs and results

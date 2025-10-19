@@ -70,14 +70,13 @@
                         <p id="mapRoadEstimate" style="font-size:13px; color:#cc5500;">Estimated road distance: - km (approx. 3–10% longer than straight-line)</p>
                         <p id="mapWarning" style="font-size:12px; color:#aa0000;">Note: This calculates a straight-line distance between points and does not follow roads. Actual travel distance may be ~3–10% longer depending on road curvature and detours.</p>
                     </div>
+                    <!-- Action Buttons for Map Mode -->
+                    <button id="confirmDestinationBtn" class="btn" type="button" style="display:none; width:100%; margin-top:16px;">Calculate Fare</button>
+                    <button id="resetMapBtn" class="btn btn-reset" type="button" style="width:100%; margin-top:8px;">Reset Map</button>
                 </div>
             </div>
 
             <!-- ✅ Distance Mode Input (hidden by default) -->
-            <div id="distanceInputContainer" style="display: none;">
-                <label for="customDistance">Enter Distance (km):</label>
-                <input type="number" id="customDistance" placeholder="e.g., 5.76" step="0.01" min="0">
-            </div>
 
             <!-- ✅ Origin Selector -->
             <div class="form-group" id="originContainer">
@@ -206,8 +205,6 @@
                     <input type="checkbox" id="hasBaggage" />
                     <span>Add Baggage Fee (₱10.00)</span>
                 </label>
-                <!-- Moved Calculate Fare button to the bottom -->
-                <button id="confirmDestinationBtn" class="btn" type="button" style="display:none; width:100%; margin-top:16px;">Calculate Fare</button>
             </div>
             <!-- Calculate Fare button is now grouped with the above options -->
             <button id="calculateFareBtn" class="btn" onclick="calculateFare()" style="margin-top: 24px;">Calculate Fare</button>
