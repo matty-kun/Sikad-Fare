@@ -194,18 +194,18 @@ function setMode(newMode) {
         case 'route':
             originContainer.style.display = 'block';
             destinationContainer.style.display = 'block';
-            toggleModeBtn.textContent = 'Switch to Distance Mode';
-            toggleMapBtn.textContent = 'Switch to Map Mode';
+            toggleModeBtn.textContent = 'Distance Mode';
+            toggleMapBtn.textContent = 'Map Mode';
             break;
         case 'distance':
             distanceInput.style.display = 'block';
-            toggleModeBtn.textContent = 'Switch to Route Mode';
-            toggleMapBtn.textContent = 'Switch to Map Mode';
+            toggleModeBtn.textContent = 'Route Mode';
+            toggleMapBtn.textContent = 'Map Mode';
             break;
         case 'map':
             mapCard.style.display = 'block';
-            toggleModeBtn.textContent = 'Switch to Distance Mode';
-            toggleMapBtn.textContent = 'Switch to Route Mode';
+            toggleModeBtn.textContent = 'Distance Mode';
+            toggleMapBtn.textContent = 'Route Mode';
             if (!mapInstance) initMap();
             setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 10);
             break;
@@ -274,7 +274,7 @@ function initMap() {
         document.getElementById('confirmDestinationBtn').style.display = 'block';
         const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
         const distKm = haversineDistance(originLatLng.lat, originLatLng.lng, lat, lng);
-        computeMapFareAndShow(distKm);
+
     });
 
     document.getElementById('confirmDestinationBtn').addEventListener('click', () => {
@@ -359,7 +359,7 @@ function computeMapFareAndShow(distKm) {
     if (hasBaggage) { regularFare += 10; studentFare += 10; }
 
     const useRoad = document.getElementById('useRoadMultiplier').checked;
-    const roadMultInput = document.getElementById('roadMultiplier');
+    const roadMultInput = document.getElementById('roadMultiplierValue'); // Corrected ID from roadMultiplier
     let usedMult = 1.0;
     if (useRoad && roadMultInput) {
         const m = parseFloat(roadMultInput.value);
@@ -374,12 +374,15 @@ function computeMapFareAndShow(distKm) {
     document.getElementById('mapDistance').textContent = `Distance: ${distKm.toFixed(2)} km`;
     document.getElementById('mapFare').textContent = `Estimated Fare: ₱${primaryFare.toFixed(2)}`;
     document.getElementById('mapRateUsed').style.display = 'block';
-    document.getElementById('mapRateUsed').textContent = `Rate Used: ₱${ratePerKm.toFixed(2)} /km`;
-    document.getElementById('mapCalcNote').style.display = 'block';
-    document.getElementById('mapCalcNote').textContent = useRoad ? `Calculation: base ₱4.34/km with gas/discounts and road multiplier x${usedMult.toFixed(2)} applied.` : 'Calculation: base ₱4.34/km with gas adjustments and discounts applied.';
-    document.getElementById('mapRoadEstimate').style.display = 'block';
-    document.getElementById('mapRoadEstimate').textContent = `Estimated road distance: ${(distKm * 1.03).toFixed(2)} - ${(distKm * 1.10).toFixed(2)} km (approx.)`;
-    document.getElementById('mapWarning').style.display = 'block';
+    document.getElementById('mapRateUsed').textContent = `Rate Used: ₱${ratePerKm.toFixed(2)} /km`;    
+    const mapCalcNoteEl = document.getElementById('mapCalcNote');
+    const mapRoadEstimateEl = document.getElementById('mapRoadEstimate');
+    if (mapRoadEstimateEl) {
+        mapRoadEstimateEl.style.display = 'block';
+        mapRoadEstimateEl.textContent = `Estimated road distance: ${(distKm * 1.03).toFixed(2)} - ${(distKm * 1.10).toFixed(2)} km (approx.)`;
+    }
+    const mapWarningEl = document.getElementById('mapWarning');
+    if (mapWarningEl) mapWarningEl.style.display = 'block';
 
     displayResult(primaryFare, 'Map Route', distKm, passengerType, gasPrice, hasBaggage);
 }
@@ -387,13 +390,34 @@ function computeMapFareAndShow(distKm) {
 // 🔄 Reset
 function resetForm() {
     document.getElementById("origin").value = "";
-    document.getElementById("destination").innerHTML = '<option value="">-- Select Destination --</option>';
+    updateDestinations(); // This will reset the destination dropdown correctly
+    document.getElementById("customDistance").value = "";
     document.getElementById("gasPrice").value = "55";
     document.getElementById("currentGasPrice").textContent = "51–60";
     currentGasPrice = 55;
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("hasBaggage").checked = false;
-    setMode('route'); // Reset to default route mode
+
+    // Reset map-specific fields
+    document.getElementById("mapDistance").textContent = "Distance: - km";
+    document.getElementById("mapFare").textContent = "Estimated Fare: ₱-";
+    document.getElementById("useRoadMultiplier").checked = false;
+    document.getElementById("roadMultiplierValue").value = "1.05";
+    document.getElementById('mapRateUsed').style.display = 'none';
+    document.getElementById('mapCalcNote').style.display = 'none';
+    document.getElementById('mapRoadEstimate').style.display = 'none';
+    document.getElementById('mapWarning').style.display = 'none';
+
+    // Reset map markers and related UI
+    if (destMarker) {
+        destMarker.remove();
+        destMarker = null;
+    }
+    document.getElementById('confirmDestinationBtn').style.display = 'none';
+
+    // Do not reset the mode, just clear inputs and results
+    document.getElementById("result").classList.remove("show");
+    document.getElementById("error").classList.remove("show");
 }
 
 // ⛽ Gas price toggle
