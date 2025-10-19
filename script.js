@@ -278,7 +278,6 @@ function initMap() {
         else destMarker = L.marker([lat, lng]).addTo(mapInstance).bindPopup('Destination').openPopup();
         localStorage.setItem(LS_DEST, JSON.stringify({ lat, lng }));
         const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
-        document.getElementById('confirmDestinationBtn').style.display = 'block';
     });
 
     document.getElementById('confirmDestinationBtn').addEventListener('click', () => {
@@ -286,6 +285,7 @@ function initMap() {
         const destLatLng = destMarker.getLatLng();
         const originLatLng = userMarker ? userMarker.getLatLng() : L.latLng(mapCenter[0], mapCenter[1]);
         const distKm = haversineDistance(originLatLng.lat, originLatLng.lng, destLatLng.lat, destLatLng.lng);
+        document.getElementById('confirmDestinationBtn').style.display = 'block';
         computeMapFareAndShow(distKm);
     });
 
