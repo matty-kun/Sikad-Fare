@@ -413,6 +413,14 @@ function computeMapFareAndShow(distKm) {
         studentFare = regularFare * 0.8;
     }
 
+    // Per Ordinance: Add ₱2.00 for every km (or fraction thereof) beyond the first 2 km.
+    let surcharge = 0;
+    if (estimatedRoadDistKm > 2) {
+        surcharge = Math.ceil(estimatedRoadDistKm - 2) * 2.00;
+        regularFare += surcharge;
+        studentFare += surcharge;
+    }
+
     // Add baggage fee after all other calculations
     if (hasBaggage) { regularFare += 10; studentFare += 10; }
 
