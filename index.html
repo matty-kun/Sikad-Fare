@@ -53,25 +53,11 @@
                     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                         <button id="setOriginBtn" class="btn" type="button" style="margin-top:6px;">Set Origin by Click</button>
                         <button id="resetOriginBtn" class="btn btn-reset" type="button" style="margin-top:6px;">Use My Location</button>
-
-                        <div class="road-multiplier-container">
-                        <label class="road-multiplier-label">
-                            <input id="useRoadMultiplier" type="checkbox" />
-                            <span>Use road multiplier</span>
-                        </label>
-                        <input
-                            id="roadMultiplierValue"
-                            type="number"
-                            step="0.01"
-                            value="1.05"
-                            class="road-multiplier-input"
-                        />
-                        </div>
                     </div>
                     <div class="map-results" style="margin-top:12px; text-align:left; color: black;">
                         <p id="mapRateUsed" style="font-size:13px; color:#004ea8;">Rate Used: ₱- /km</p>
-                        <p id="mapRoadEstimate" style="font-size:13px; color:#cc5500;">Estimated road distance: - km (approx. 3–10% longer than straight-line)</p>
-                        <p id="mapWarning" style="font-size:12px; color:#aa0000;">Note: This calculates a straight-line distance between points and does not follow roads. Actual travel distance may be ~3–10% longer depending on road curvature and detours.</p>
+                        <p id="mapRoadEstimate" style="font-size:13px; color:#cc5500;">Estimated road distance: - km</p>
+                        <p id="mapWarning" style="font-size:12px; color:#aa0000;">Note: Fare is based on an estimated road distance (straight-line distance + 8%) to account for road curves.</p>
                     </div>
                     <!-- Action Buttons for Map Mode -->
                     <button id="mapCalculateBtn" class="btn" type="button" style="width:100%; margin-top:16px;">Calculate Fare</button>
