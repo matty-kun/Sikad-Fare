@@ -6,6 +6,7 @@ let currentMode = 'route'; // 'route', 'distance', or 'map'
 let mapInstance = null;
 let userMarker = null;
 let destMarker = null;
+let routeLine = null; // To hold the line on the map
 let mapCenter = [7.2320, 124.3650]; // approximate Midsayap, Cotabato
 let setOriginMode = false;
 
@@ -13,7 +14,30 @@ let setOriginMode = false;
 const LS_ORIGIN = 'sikad_map_origin';
 const LS_DEST = 'sikad_map_dest';
 
-// 🗺️ Route Matrix (Base Fares at ₱51–60/L)
+// 📍 Custom Map Icons
+const originIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+const destIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+const originMarkerOptions = { icon: originIcon, draggable: true };
+const destMarkerOptions = { icon: destIcon };
+
+
+// ️ Route Matrix (Base Fares at ₱51–60/L)
 const baseRoutes = {
     "Town Proper-Villarica": { distance: 4.3, baseRegular: 21.00, baseStudent: 16.80 },
     "Town Proper-Sadaan": { distance: 3.56, baseRegular: 18.00, baseStudent: 14.76 },
@@ -132,16 +156,6 @@ function calculateFare() {
         routeName = `${normalizeName(origin)} to ${normalizeName(destination)}`;
         distance = route.distance;
 
-    } else if (currentMode === 'distance') {
-        const customDist = parseFloat(document.getElementById("customDistance").value);
-        if (isNaN(customDist) || customDist <= 0) {
-            return showError("Please enter a valid distance in kilometers.");
-        }
-        // Using the same per-km logic as map mode for consistency
-        const ratePerKm = 4.34; // Base rate per km
-        fare = customDist * ratePerKm * (passengerType === 'student' ? 0.8 : 1.0);
-        routeName = "Custom Distance";
-        distance = customDist;
     }
 
     if (hasBaggage) fare += 10;
@@ -175,59 +189,38 @@ function setMode(newMode) {
 
     const originContainer = document.getElementById('originContainer');
     const destinationContainer = document.getElementById('destinationContainer');
-    const distanceInput = document.getElementById('distanceInputContainer');
     const mapCard = document.getElementById('mapCard');
-    const toggleModeBtn = document.getElementById('toggleModeBtn');
-    const toggleMapBtn = document.getElementById('toggleMapBtn');
 
-    // Hide all mode-specific containers
+    // Reset all mode buttons and containers
+    ['routeModeBtn', 'mapModeBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.remove('active');
+    });
     originContainer.style.display = 'none';
     destinationContainer.style.display = 'none';
-    distanceInput.style.display = 'none';
     mapCard.style.display = 'none';
 
-    // Show the correct container and update button text
+    // Activate the correct mode
     switch (currentMode) {
         case 'route':
             originContainer.style.display = 'block';
             destinationContainer.style.display = 'block';
-            toggleModeBtn.textContent = 'Distance Mode';
-            toggleMapBtn.textContent = 'Map Mode';
             document.getElementById('calculateFareBtn').style.display = 'inline-block';
             document.getElementById('resetFormBtn').style.display = 'inline-block';
-            break;
-        case 'distance':
-            distanceInput.style.display = 'block';
-            toggleModeBtn.textContent = 'Route Mode';
-            toggleMapBtn.textContent = 'Map Mode';
-            document.getElementById('calculateFareBtn').style.display = 'inline-block';
-            document.getElementById('resetFormBtn').style.display = 'inline-block';
+            document.getElementById('routeModeBtn').classList.add('active');
             break;
         case 'map':
             mapCard.style.display = 'block';
-            toggleModeBtn.textContent = 'Distance Mode';
-            toggleMapBtn.textContent = 'Route Mode';
             if (!mapInstance) initMap();
             setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 10);
             document.getElementById('calculateFareBtn').style.display = 'none';
             document.getElementById('resetFormBtn').style.display = 'none';
             // Ensure map-specific buttons are managed
             document.getElementById('resetMapBtn').style.display = 'block';
+            document.getElementById('mapModeBtn').classList.add('active');
             break;
     }
     document.getElementById("result").classList.remove("show");
-}
-
-// Toggle to Distance Mode or back to Route Mode
-function toggleMode() {
-    const newMode = currentMode === 'distance' ? 'route' : 'distance';
-    setMode(newMode);
-}
-
-// Toggle to Map Mode or back to Route Mode
-function toggleMapMode() {
-    const newMode = currentMode === 'map' ? 'route' : 'map';
-    setMode(newMode);
 }
 
 // Initialize Leaflet map
@@ -244,13 +237,13 @@ function initMap() {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
             mapInstance.setView([lat, lng], 13);
-            if (userMarker) userMarker.setLatLng([lat, lng]);
-            else userMarker = L.marker([lat, lng], { draggable: true }).addTo(mapInstance).bindPopup('You are here').openPopup();
+            if (userMarker) { userMarker.setLatLng([lat, lng]); }
+            else { userMarker = L.marker([lat, lng], originMarkerOptions).addTo(mapInstance).bindPopup('You are here').openPopup(); }
         }, () => {
-            if (!userMarker) userMarker = L.marker(mapCenter).addTo(mapInstance).bindPopup('Default location');
+            if (!userMarker) userMarker = L.marker(mapCenter, originMarkerOptions).addTo(mapInstance).bindPopup('Default location');
         });
     } else {
-        userMarker = L.marker(mapCenter).addTo(mapInstance).bindPopup('Location unavailable');
+        userMarker = L.marker(mapCenter, originMarkerOptions).addTo(mapInstance).bindPopup('Location unavailable');
     }
 
 
@@ -273,8 +266,8 @@ function initMap() {
     mapInstance.on('click', function(e) {
         const { lat, lng } = e.latlng;
         if (setOriginMode) {
-            if (userMarker) userMarker.setLatLng([lat, lng]);
-            else userMarker = L.marker([lat, lng], { draggable: true }).addTo(mapInstance).bindPopup('Origin (you)').openPopup();
+            if (userMarker) { userMarker.setLatLng([lat, lng]); }
+            else { userMarker = L.marker([lat, lng], originMarkerOptions).addTo(mapInstance).bindPopup('Origin (you)').openPopup(); }
             localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat, lng }));
             userMarker.on('dragend', () => {
                 if (destMarker) {
@@ -283,6 +276,7 @@ function initMap() {
                     const d = haversineDistance(a.lat, a.lng, b.lat, b.lng);
                     localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat: a.lat, lng: a.lng }));
                     computeMapFareAndShow(d);
+                    drawRouteLine();
                 }
             });
             setOriginMode = false;
@@ -291,8 +285,9 @@ function initMap() {
             document.getElementById('setOriginBtn').style.borderColor = '';
             return;
         }
-        if (destMarker) destMarker.setLatLng([lat, lng]);
-        else destMarker = L.marker([lat, lng]).addTo(mapInstance).bindPopup('Destination').openPopup();
+        if (destMarker) { destMarker.setLatLng([lat, lng]); }
+        else { destMarker = L.marker([lat, lng], destMarkerOptions).addTo(mapInstance).bindPopup('Destination').openPopup(); }
+        drawRouteLine();
         localStorage.setItem(LS_DEST, JSON.stringify({ lat, lng }));
     });
 
@@ -337,8 +332,8 @@ function initMap() {
     try {
         const savedOrigin = JSON.parse(localStorage.getItem(LS_ORIGIN));
         if (savedOrigin && savedOrigin.lat && savedOrigin.lng) {
-            if (userMarker) userMarker.setLatLng([savedOrigin.lat, savedOrigin.lng]);
-            else userMarker = L.marker([savedOrigin.lat, savedOrigin.lng], { draggable: true }).addTo(mapInstance).bindPopup('Origin (saved)');
+            if (userMarker) { userMarker.setLatLng([savedOrigin.lat, savedOrigin.lng]); }
+            else { userMarker = L.marker([savedOrigin.lat, savedOrigin.lng], originMarkerOptions).addTo(mapInstance).bindPopup('Origin (saved)'); }
             userMarker.on('dragend', () => {
                 if (destMarker) {
                     const a = userMarker.getLatLng();
@@ -346,19 +341,39 @@ function initMap() {
                     const d = haversineDistance(a.lat, a.lng, b.lat, b.lng);
                     localStorage.setItem(LS_ORIGIN, JSON.stringify({ lat: a.lat, lng: a.lng }));
                     computeMapFareAndShow(d);
+                    drawRouteLine();
                 }
             });
         }
         const savedDest = JSON.parse(localStorage.getItem(LS_DEST));
         if (savedDest && savedDest.lat && savedDest.lng) {
-            if (destMarker) destMarker.setLatLng([savedDest.lat, savedDest.lng]);
-            else destMarker = L.marker([savedDest.lat, savedDest.lng]).addTo(mapInstance).bindPopup('Destination (saved)');
+            if (destMarker) { destMarker.setLatLng([savedDest.lat, savedDest.lng]); }
+            else { destMarker = L.marker([savedDest.lat, savedDest.lng], destMarkerOptions).addTo(mapInstance).bindPopup('Destination (saved)'); }
             if (userMarker) {
                 const d = haversineDistance(userMarker.getLatLng().lat, userMarker.getLatLng().lng, savedDest.lat, savedDest.lng);
                 computeMapFareAndShow(d);
+                drawRouteLine();
             }
         }
     } catch (e) { /* ignore */ }
+}
+
+// 🗺️ Draw a line between origin and destination markers
+function drawRouteLine() {
+    // If either marker is missing, remove the line if it exists
+    if (!userMarker || !destMarker) {
+        if (routeLine) {
+            routeLine.remove();
+            routeLine = null;
+        }
+        return;
+    }
+    const latlngs = [userMarker.getLatLng(), destMarker.getLatLng()];
+    if (routeLine) {
+        routeLine.setLatLngs(latlngs); // Update existing line
+    } else {
+        routeLine = L.polyline(latlngs, { color: '#004ea8', weight: 5, opacity: 0.8 }).addTo(mapInstance); // Create new line
+    }
 }
 
 // Haversine formula (returns distance in km)
@@ -425,10 +440,9 @@ function computeMapFareAndShow(distKm) {
 function resetForm() {
     document.getElementById("origin").value = "";
     updateDestinations(); // This will reset the destination dropdown correctly
-    document.getElementById("customDistance").value = "";
-    document.getElementById("gasPrice").value = "55";
+    document.getElementById("gasPrice").value = "60";
     document.getElementById("currentGasPrice").textContent = "51–60";
-    currentGasPrice = 55;
+    currentGasPrice = 60;
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("hasBaggage").checked = false;
 
@@ -442,6 +456,11 @@ function resetForm() {
     if (destMarker) {
         destMarker.remove();
         destMarker = null;
+    }
+    // Also remove the route line from the map
+    if (routeLine) {
+        routeLine.remove();
+        routeLine = null;
     }
     localStorage.removeItem(LS_DEST); // Clear saved destination
 
@@ -555,11 +574,10 @@ window.addEventListener("load", () => {
 
     // Hide error on interaction
     const errorHidingElements = [
-        'origin',
-        'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage',
+        'origin', 'destination', 'gasPrice', 'student', 'regular', 'hasBaggage',
         'changePriceBtn'
     ];
-    const elements = ['toggleModeBtn', 'toggleMapBtn', 'changePriceBtn', 'origin', 'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage', 'mapCalculateBtn', 'resetMapBtn', 'calculateFareBtn'];
+    const elements = ['routeModeBtn', 'mapModeBtn', 'changePriceBtn', 'origin', 'destination', 'gasPrice', 'student', 'regular', 'hasBaggage', 'mapCalculateBtn', 'resetMapBtn', 'calculateFareBtn'];
     elements.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
