@@ -393,6 +393,9 @@ function computeMapFareAndShow(distKm) {
     const gasPriceElem = document.getElementById('gasPrice');
     const gasPrice = gasPriceElem.style.display === 'none' ? currentGasPrice : parseFloat(gasPriceElem.value);
 
+    // Automatically apply an 8% multiplier to estimate road distance from straight-line distance
+    const estimatedRoadDistKm = distKm * 1.08;
+
     let ratePerKm = 4.34;
     if (gasPrice >= 80) ratePerKm *= 1.1;
     if (gasPrice >= 90) ratePerKm *= 1.2;
@@ -400,26 +403,14 @@ function computeMapFareAndShow(distKm) {
     let regularFare, studentFare;
 
     // Apply minimum fare for distances under 1 km, similar to "within town proper"
-    if (distKm < 1) {
+    if (estimatedRoadDistKm < 1) {
         const baseMinRegular = 15.00;
         const baseMinStudent = 12.00;
         regularFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'regular');
         studentFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'student');
     } else {
-        regularFare = distKm * ratePerKm;
+        regularFare = estimatedRoadDistKm * ratePerKm;
         studentFare = regularFare * 0.8;
-    }
-
-    const useRoad = document.getElementById('useRoadMultiplier').checked;
-    const roadMultInput = document.getElementById('roadMultiplierValue');
-    let usedMult = 1.0;
-    if (useRoad && roadMultInput) {
-        const m = parseFloat(roadMultInput.value);
-        if (!isNaN(m) && m > 0) {
-            usedMult = m;
-            regularFare *= usedMult;
-            studentFare *= usedMult;
-        }
     }
 
     // Add baggage fee after all other calculations
@@ -430,10 +421,10 @@ function computeMapFareAndShow(distKm) {
     document.getElementById('mapRateUsed').textContent = `Rate Used: ₱${ratePerKm.toFixed(2)} /km`;    
     const mapRoadEstimateEl = document.getElementById('mapRoadEstimate');
     if (mapRoadEstimateEl) {
-        mapRoadEstimateEl.textContent = `Estimated road distance: ${(distKm * 1.03).toFixed(2)} - ${(distKm * 1.10).toFixed(2)} km (approx.)`;
+        mapRoadEstimateEl.textContent = `Estimated road distance: ${estimatedRoadDistKm.toFixed(2)} km`;
     }
 
-    displayResult(primaryFare, 'Map Route', distKm, passengerType, gasPrice, hasBaggage);
+    displayResult(primaryFare, 'Map Route', estimatedRoadDistKm, passengerType, gasPrice, hasBaggage);
 }
 
 // 🔄 Reset
@@ -446,11 +437,9 @@ function resetForm() {
     document.querySelector('input[name="passengerType"][value="student"]').checked = true;
     document.getElementById("hasBaggage").checked = false;
 
-    // Reset map-specific fields and text
-    document.getElementById("useRoadMultiplier").checked = false;
-    document.getElementById("roadMultiplierValue").value = "1.05";
+    // Reset map-specific text
     document.getElementById('mapRateUsed').textContent = 'Rate Used: ₱- /km';
-    document.getElementById('mapRoadEstimate').textContent = 'Estimated road distance: - km (approx. 3–10% longer than straight-line)';
+    document.getElementById('mapRoadEstimate').textContent = 'Estimated road distance: - km';
 
     // Reset map markers and related UI
     if (destMarker) {
