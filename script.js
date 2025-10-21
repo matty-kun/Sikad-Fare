@@ -89,6 +89,64 @@ function getFareByGasPrice(gasPrice, baseRegular, baseStudent, passengerType) {
 }
 
 // 🚲 Fare calculation
+function calculateFare() {
+    // Clear previous errors and results
+    document.getElementById("error").classList.remove("show");
+    document.getElementById("result").classList.remove("show");
+
+    const passengerType = document.querySelector('input[name="passengerType"]:checked').value;
+    const hasBaggage = document.getElementById('hasBaggage').checked;
+    const gasPrice = parseFloat(document.getElementById('gasPrice').value);
+
+    let fare = 0;
+    let routeName = "N/A";
+    let distance = "N/A";
+
+    if (currentMode === 'route') {
+        const origin = document.getElementById("origin").value;
+        const destination = document.getElementById("destination").value;
+
+        if (!origin || !destination) {
+            return showError("Please select both an origin and a destination.");
+        }
+
+        const route = findRoute(origin, destination);
+        if (!route) {
+            // Special case for within town proper
+            const properAliases = ["Town Proper", "Midsayap Proper", "Town Hall", "Public Market", "Poblacion", "Pob", "Centro", "Proper"];
+            const isOriginProper = properAliases.some(alias => normalizeName(origin).toLowerCase().includes(alias.toLowerCase()));
+            const isDestProper = properAliases.some(alias => normalizeName(destination).toLowerCase().includes(alias.toLowerCase()));
+
+            if (isOriginProper && isDestProper) {
+                const withinTownFare = getFareByGasPrice(gasPrice, 15.00, 12.00, passengerType);
+                fare = hasBaggage ? withinTownFare + 10 : withinTownFare;
+                routeName = `${origin} to ${destination}`;
+                distance = "Within Town Proper";
+                displayResult(fare, routeName, distance, passengerType, gasPrice, hasBaggage);
+                return;
+            }
+            return showError("Fare for this route is not defined in the ordinance. Please use Distance or Map mode.");
+        }
+
+        fare = getFareByGasPrice(gasPrice, route.baseRegular, route.baseStudent, passengerType);
+        routeName = `${normalizeName(origin)} to ${normalizeName(destination)}`;
+        distance = route.distance;
+
+    } else if (currentMode === 'distance') {
+        const customDist = parseFloat(document.getElementById("customDistance").value);
+        if (isNaN(customDist) || customDist <= 0) {
+            return showError("Please enter a valid distance in kilometers.");
+        }
+        // Using the same per-km logic as map mode for consistency
+        const ratePerKm = 4.34; // Base rate per km
+        fare = customDist * ratePerKm * (passengerType === 'student' ? 0.8 : 1.0);
+        routeName = "Custom Distance";
+        distance = customDist;
+    }
+
+    if (hasBaggage) fare += 10;
+    displayResult(fare, routeName, distance, passengerType, gasPrice, hasBaggage);
+}
 
 
 // 🧾 Show fare
@@ -324,12 +382,21 @@ function computeMapFareAndShow(distKm) {
     if (gasPrice >= 80) ratePerKm *= 1.1;
     if (gasPrice >= 90) ratePerKm *= 1.2;
 
-    let regularFare = distKm * ratePerKm;
-    let studentFare = regularFare * 0.8;
-    if (hasBaggage) { regularFare += 10; studentFare += 10; }
+    let regularFare, studentFare;
+
+    // Apply minimum fare for distances under 1 km, similar to "within town proper"
+    if (distKm < 1) {
+        const baseMinRegular = 15.00;
+        const baseMinStudent = 12.00;
+        regularFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'regular');
+        studentFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'student');
+    } else {
+        regularFare = distKm * ratePerKm;
+        studentFare = regularFare * 0.8;
+    }
 
     const useRoad = document.getElementById('useRoadMultiplier').checked;
-    const roadMultInput = document.getElementById('roadMultiplierValue'); // Corrected ID from roadMultiplier
+    const roadMultInput = document.getElementById('roadMultiplierValue');
     let usedMult = 1.0;
     if (useRoad && roadMultInput) {
         const m = parseFloat(roadMultInput.value);
@@ -339,6 +406,10 @@ function computeMapFareAndShow(distKm) {
             studentFare *= usedMult;
         }
     }
+
+    // Add baggage fee after all other calculations
+    if (hasBaggage) { regularFare += 10; studentFare += 10; }
+
     const primaryFare = passengerType === 'student' ? studentFare : regularFare;
 
     document.getElementById('mapRateUsed').textContent = `Rate Used: ₱${ratePerKm.toFixed(2)} /km`;    
@@ -487,8 +558,8 @@ window.addEventListener("load", () => {
         'origin',
         'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage',
         'changePriceBtn'
-    ]; // This array seems unused, can be removed later.
-    const elements = ['toggleModeBtn', 'toggleMapModeBtn', 'changePriceBtn', 'origin', 'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage', 'calculateMapFareBtn', 'resetMapBtn'];
+    ];
+    const elements = ['toggleModeBtn', 'toggleMapBtn', 'changePriceBtn', 'origin', 'destination', 'customDistance', 'gasPrice', 'student', 'regular', 'hasBaggage', 'mapCalculateBtn', 'resetMapBtn', 'calculateFareBtn'];
     elements.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
