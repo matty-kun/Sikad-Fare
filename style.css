@@ -102,6 +102,12 @@ body {
     border-color: #3a3d40;
 }
 
+.mode-btn.active {
+    background: #004ea8; /* Highlight color for active mode */
+    color: #fff;
+    border-color: #004ea8;
+}
+
 /* --- Form Elements --- */
 .form-group {
     margin-bottom: 24px;
