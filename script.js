@@ -45,7 +45,7 @@ const baseRoutes = {
     "Town Proper-Kimagango": { distance: 5.21, baseRegular: 21.00, baseStudent: 16.80 },
     "Town Proper-Rangaban": { distance: 7.50, baseRegular: 27.00, baseStudent: 21.60 },
     "Town Proper-Kiwanan": { distance: 6.46, baseRegular: 18.00, baseStudent: 14.76 },
-    "Town Proper-Aleosan": { distance: 9.03, baseRegular: 23.00, baseStudent: 18.86 },
+    "Town Proper-Aleosan": { distance: 9.03, baseRegular: 26.00, baseStudent: 20.86 },
     "Town Proper-Agriculture": { distance: 5.01, baseRegular: 21.00, baseStudent: 16.80 },
     "Town Proper-Salunayan": { distance: 5.76, baseRegular: 25.00, baseStudent: 20.00 },
     "Town Proper-San Isidro": { distance: 3.63, baseRegular: 21.00, baseStudent: 16.80 },
@@ -67,13 +67,28 @@ const townRoutes = {
 function normalizeName(name) {
     if (!name) return "";
     name = name.trim();
-    const properAliases = ["Town Proper", "Midsayap Proper", "Town Hall", "Public Market", "Poblacion", "Pob", "Centro", "Proper"];
-    if (properAliases.some(alias => name.toLowerCase().includes(alias.toLowerCase()))) {
+    const lowerName = name.toLowerCase();
+
+    // Aliases that must be an exact match
+    const exactAliases = ["town proper", "midsayap proper", "town hall", "public market", "centro", "proper"];
+    if (exactAliases.includes(lowerName)) {
         return "Town Proper";
     }
-    if (name.toLowerCase().includes("agriculture")) return "Salunayan";
-    if (name.toLowerCase().includes("salunayan")) return "Salunayan";
-    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+
+    // Aliases that can be a partial match at the start (e.g., "Pob 1")
+    const partialAliases = ["poblacion", "pob"];
+    if (partialAliases.some(alias => lowerName.startsWith(alias))) {
+        return "Town Proper";
+    }
+
+    if (lowerName.includes("agriculture")) return "Salunayan";
+    if (lowerName.includes("salunayan")) return "Salunayan";
+
+    // Capitalize each word in the name for consistency (e.g., "San Isidro")
+    return name
+        .split(' ')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
 }
 
 // 🔁 Generate bidirectional routes
@@ -212,6 +227,8 @@ function setMode(newMode) {
         case 'map':
             mapCard.style.display = 'block';
             if (!mapInstance) initMap();
+            // Show map-specific offline indicator only when offline
+            document.getElementById('mapOfflineIndicator').style.display = navigator.onLine ? 'none' : 'block';
             setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 10);
             document.getElementById('calculateFareBtn').style.display = 'none';
             document.getElementById('resetFormBtn').style.display = 'none';
@@ -227,8 +244,9 @@ function setMode(newMode) {
 function initMap() {
     mapInstance = L.map('map').setView(mapCenter, 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
+        minZoom: 12,
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapInstance);
     setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
 
@@ -400,18 +418,9 @@ function computeMapFareAndShow(distKm) {
     if (gasPrice >= 80) ratePerKm *= 1.1;
     if (gasPrice >= 90) ratePerKm *= 1.2;
 
-    let regularFare, studentFare;
-
-    // Apply minimum fare for distances under 1 km, similar to "within town proper"
-    if (estimatedRoadDistKm < 1) {
-        const baseMinRegular = 15.00;
-        const baseMinStudent = 12.00;
-        regularFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'regular');
-        studentFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'student');
-    } else {
-        regularFare = estimatedRoadDistKm * ratePerKm;
-        studentFare = regularFare * 0.8;
-    }
+    // Base fare calculation from distance
+    let regularFare = estimatedRoadDistKm * ratePerKm;
+    let studentFare = regularFare * 0.8;
 
     // Per Ordinance: Add ₱2.00 for every km (or fraction thereof) beyond the first 2 km.
     let surcharge = 0;
@@ -420,6 +429,16 @@ function computeMapFareAndShow(distKm) {
         regularFare += surcharge;
         studentFare += surcharge;
     }
+
+    // Define and get the minimum fare adjusted for gas price
+    const baseMinRegular = 15.00;
+    const baseMinStudent = 12.00;
+    const minRegularFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'regular');
+    const minStudentFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'student');
+
+    // Ensure the calculated fare is not below the minimum fare
+    regularFare = Math.max(regularFare, minRegularFare);
+    studentFare = Math.max(studentFare, minStudentFare);
 
     // Add baggage fee after all other calculations
     if (hasBaggage) { regularFare += 10; studentFare += 10; }
@@ -528,7 +547,13 @@ function updateDestinations() {
 
 // 🌐 Online/offline indicator
 function updateOnlineStatus() {
-    document.getElementById("offlineIndicator").style.display = navigator.onLine ? "none" : "block";
+    const isOnline = navigator.onLine;
+    document.getElementById("offlineIndicator").style.display = isOnline ? "none" : "block";
+    
+    // Also update the map-specific indicator if the map is active
+    if (currentMode === 'map') {
+        document.getElementById('mapOfflineIndicator').style.display = isOnline ? 'none' : 'block';
+    }
 }
 
 // 📦 PWA setup
