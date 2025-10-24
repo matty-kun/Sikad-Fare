@@ -1,0 +1,95 @@
+﻿2025-10-22 11:39:11,254  INFO [Main] Maperitive.Scripting.ScriptExecutor - Executing command 'set-setting name=gui.layout.assistant.visible value=True'
+2025-10-22 11:39:11,436  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: > use-ruleset alias=default
+2025-10-22 11:39:12,226  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Running the script 'D:\\Sickad\\Sikad-Fare\\maperitive.mscript'...
+2025-10-22 11:39:12,233  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: > load-source midsayap.osm
+2025-10-22 11:39:12,344  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Started reading OSM data
+2025-10-22 11:39:12,386  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Read 21303 nodes, 4060 ways and 8 relations in total
+2025-10-22 11:39:12,396  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: > set-geo-bounds 124.4928759,7.1494644,124.5728759,7.2294644
+2025-10-22 11:39:12,407  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Setting the geometry bounds to srid=4326, (124.4928759,7.1494644,124.5728759,7.2294644)
+2025-10-22 11:39:12,407  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: > generate-tiles minzoom=12 maxzoom=18
+2025-10-22 11:39:12,673  INFO [Main] Brejc.OsmLibrary.CoastlinesProcessing.CoastlineProcessor - Starting coastline processor...
+2025-10-22 11:39:12,692  INFO [Main] Brejc.OsmLibrary.CoastlinesProcessing.CoastlineProcessor - All coastlines are closed
+2025-10-22 11:39:12,693  INFO [Main] Brejc.OsmLibrary.CoastlinesProcessing.CoastlineProcessor - Finished coastline processing.
+2025-10-22 11:39:12,719  INFO [BackgroundTaskThread 3] Maperitive.Updating.CheckForUpdatesTask - App. releases data has been fetched.
+2025-10-22 11:39:12,850  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Started generating tiles into directory D:\Sickad\Sikad-Fare\Tiles
+2025-10-22 11:39:12,864  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 12 (4 possible tiles)...
+2025-10-22 11:39:12,991  INFO [AsyncCmdLogTaskThread 5] Brejc.OsmLibrary.CoastlinesProcessing.CoastlineProcessor - Starting coastline processor...
+2025-10-22 11:39:12,992  INFO [AsyncCmdLogTaskThread 5] Brejc.OsmLibrary.CoastlinesProcessing.CoastlineProcessor - All coastlines are closed
+2025-10-22 11:39:12,992  INFO [AsyncCmdLogTaskThread 5] Brejc.OsmLibrary.CoastlinesProcessing.CoastlineProcessor - Finished coastline processing.
+2025-10-22 11:39:13,037  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 4 tiles for zoom level 12 (23.0 tiles/s)
+2025-10-22 11:39:13,037  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 13 (6 possible tiles)...
+2025-10-22 11:39:13,100  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 6 tiles for zoom level 13 (98.5 tiles/s)
+2025-10-22 11:39:13,101  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 14 (20 possible tiles)...
+2025-10-22 11:39:13,243  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 20 tiles for zoom level 14 (140.2 tiles/s)
+2025-10-22 11:39:13,244  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 15 (64 possible tiles)...
+2025-10-22 11:39:13,606  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 64 tiles for zoom level 15 (176.5 tiles/s)
+2025-10-22 11:39:13,608  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 16 (240 possible tiles)...
+2025-10-22 11:39:13,645  WARN [AsyncCmdLogTaskThread 5] Karta.Infrastructure.DefaultResourceFetcher - Cannot load resource from file 'D:\Sickad\Sikad-Fare\Maperitive\icons/SJJB/png/barrier_gate.p.32.png': System.IO.FileNotFoundException: Could not find file 'D:\Sickad\Sikad-Fare\Maperitive\icons\SJJB\png\barrier_gate.p.32.png'.
+File name: 'D:\Sickad\Sikad-Fare\Maperitive\icons\SJJB\png\barrier_gate.p.32.png'
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.File.InternalReadAllBytes(String path, Boolean checkHost)
+   at Brejc.Common.FileSystem.WindowsFileSystem.ReadFileAsBytes(String fileName)
+   at Karta.Infrastructure.DefaultResourceFetcher.FetchFileResource(ResourceData& resourceData, IResourcePolicy resourcePolicy)
+2025-10-22 11:39:13,786  WARN [AsyncCmdLogTaskThread 5] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:39:14,876  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 240 tiles for zoom level 16 (189.7 tiles/s)
+2025-10-22 11:39:14,877  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 17 (930 possible tiles)...
+2025-10-22 11:39:14,883  WARN [AsyncCmdLogTaskThread 5] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:39:14,884  WARN [AsyncCmdLogTaskThread 5] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:39:14,885  WARN [AsyncCmdLogTaskThread 5] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:39:14,885  WARN [AsyncCmdLogTaskThread 5] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:39:18,569  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 930 tiles for zoom level 17 (251.9 tiles/s)
+2025-10-22 11:39:18,569  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Generating tiles for zoom level 18 (3600 possible tiles)...
+2025-10-22 11:39:22,807  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 1008 tiles (28%) for zoom level 18 so far (237.9 tiles/s)...
+2025-10-22 11:39:27,572  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 2007 tiles (56%) for zoom level 18 so far (222.9 tiles/s)...
+2025-10-22 11:39:31,348  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 3006 tiles (84%) for zoom level 18 so far (235.3 tiles/s)...
+2025-10-22 11:39:33,571  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Created 3600 tiles for zoom level 18 (240.0 tiles/s)
+2025-10-22 11:39:33,571  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: Tile generation done, 4864 tiles generated in total (234.9 tiles/s)
+2025-10-22 11:39:33,579  INFO [AsyncCmdLogTaskThread 5] Maperitive.Gui.Views.CommanderView - Info: READY
+2025-10-22 11:40:15,076  WARN [Main] Karta.Infrastructure.DefaultResourceFetcher - Cannot load resource from file 'D:\Sickad\Sikad-Fare\Maperitive\icons/SJJB/png/barrier_gate.p.32.png': System.IO.FileNotFoundException: Could not find file 'D:\Sickad\Sikad-Fare\Maperitive\icons\SJJB\png\barrier_gate.p.32.png'.
+File name: 'D:\Sickad\Sikad-Fare\Maperitive\icons\SJJB\png\barrier_gate.p.32.png'
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.File.InternalReadAllBytes(String path, Boolean checkHost)
+   at Brejc.Common.FileSystem.WindowsFileSystem.ReadFileAsBytes(String fileName)
+   at Karta.Infrastructure.DefaultResourceFetcher.FetchFileResource(ResourceData& resourceData, IResourcePolicy resourcePolicy)
+2025-10-22 11:40:15,082  WARN [Main] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:40:16,372  WARN [Main] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:40:16,373  WARN [Main] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:40:16,373  WARN [Main] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:40:16,374  WARN [Main] Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder - Error in the icon placement algorithm.
+System.NotImplementedException: There are an odd number of crossings, they should be even.
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindPointInsidePolygon(Double depth, Double startPointX, Double startPointY, IPointD2List polygonPoints, Boolean searchInsideSameSliceOnly, Boolean searchHorizontally)
+   at Brejc.Geometry.Algorithms.Polygons.BrekiPolygonCenterPointFinder.FindCenterPoint(IPointD2List polygonPoints)
+2025-10-22 11:56:10,591  INFO [Main] Maperitive.Gui.Forms.MaperitiveMainForm - Main window is closing.
+2025-10-22 11:56:10,600  INFO [Main] Maperitive.Gui.Forms.MaperitiveMainForm - Main window has been closed.
+2025-10-22 11:56:10,654  INFO [Main]   Maperitive.Program - Application shell has finished its work.
