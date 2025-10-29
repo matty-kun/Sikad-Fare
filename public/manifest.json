@@ -1,7 +1,7 @@
 {
   "name": "Sikad Fare Calculator - Midsayap",
   "short_name": "SikadFare",
-  "description": "Official tricycle fare calculator for Midsayap, Cotabato based on LGU Ordinance No. 536",
+  "description": "Tricycle fare calculator for Midsayap, Cotabato based on LGU Ordinance No. 536",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
