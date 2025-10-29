@@ -197,7 +197,7 @@ export default function MapMode({
   return (
     <div>
       {/* Map Container */}
-      <div ref={mapContainerRef} className="h-96 rounded-xl overflow-hidden mb-4 border-2 border-gray-300" />
+      <div ref={mapContainerRef} className="h-96 rounded-xl overflow-hidden mb-4 border-2 border-gray-300 relative z-10" />
 
       {/* Map Info */}
       <div className="bg-gray-50 p-4 rounded-xl mb-4 text-sm space-y-1">
