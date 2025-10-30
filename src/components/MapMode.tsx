@@ -248,54 +248,59 @@ export default function MapMode({
       <GasPriceSelector gasPrice={gasPrice} onChange={onGasPriceChange} />
 
       {/* Passenger Type */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Passenger Type
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => onPassengerTypeChange('student')}
-            className={`p-4 rounded-xl font-bold text-sm transition-all border-2 ${
-              passengerType === 'student'
-                ? 'bg-black text-white border-black'
-                : 'bg-gray-50 text-gray-700 border-gray-300'
-            }`}
-          >
-            Student / PWD / Senior
-          </button>
-          <button
-            type="button"
-            onClick={() => onPassengerTypeChange('regular')}
-            className={`p-4 rounded-xl font-bold text-sm transition-all border-2 ${
-              passengerType === 'regular'
-                ? 'bg-black text-white border-black'
-                : 'bg-gray-50 text-gray-700 border-gray-300'
-            }`}
-          >
-            Regular
-          </button>
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+            <span className="text-lg">👤</span> Passenger
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => onPassengerTypeChange('student')}
+              className={`p-4 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 ${ 
+                passengerType === 'student'
+                  ? 'bg-black text-white border-black shadow-lg scale-105'
+                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="text-2xl mb-1">🎓</div>
+              <div className="text-xs">Student/PWD/Senior</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => onPassengerTypeChange('regular')}
+              className={`p-4 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 ${ 
+                passengerType === 'regular'
+                  ? 'bg-black text-white border-black shadow-lg scale-105'
+                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="text-2xl mb-1">👔</div>
+              <div className="text-xs">Regular</div>
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Baggage */}
-      <div className="mb-6">
-        <label className="flex items-center gap-3 p-4 bg-gray-50 border-2 border-gray-300 rounded-xl cursor-pointer">
+  
+        {/* Baggage */}
+        <label className="flex items-center gap-4 p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl cursor-pointer hover:border-gray-300 transition-all active:scale-[0.98] mt-4 pb-4">
           <input
             type="checkbox"
             checked={hasBaggage}
             onChange={(e) => onBaggageChange(e.target.checked)}
-            className="w-5 h-5 accent-black"
+            className="w-6 h-6 accent-black cursor-pointer rounded-lg"
           />
-          <span className="text-sm font-semibold">Add Baggage Fee (₱10.00)</span>
+          <div className="flex-1">
+            <div className="font-bold text-gray-900 flex items-center gap-2">
+              <span>🎒</span> Baggage
+            </div>
+            <div className="text-xs text-gray-600 mt-0.5">Add ₱10.00 fee</div>
+          </div>
         </label>
-      </div>
 
       {/* Action Buttons */}
       <button
         type="button"
         onClick={handleCalculate}
-        className="w-full py-4 bg-black text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all mb-2"
+        className="w-full py-4 bg-black text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all mb-2 mt-4"
       >
         Calculate Fare
       </button>
