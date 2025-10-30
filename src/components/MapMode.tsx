@@ -5,6 +5,7 @@ import L from 'leaflet';
 import { MapMarker, PassengerType } from '../lib/types';
 import { calculateMapFare, haversineDistance } from '../lib/fareCalculations';
 import GasPriceSelector from './GasPriceSelector';
+import toast from 'react-hot-toast';
 
 interface MapModeProps {
   gasPrice: number;
@@ -154,7 +155,7 @@ export default function MapMode({
 
   const handleCalculate = () => {
     if (!originMarker || !destMarker) {
-      onError('Please set both origin and destination on the map');
+      toast.error('Please set both origin and destination on the map');
       return;
     }
 
@@ -249,7 +250,7 @@ export default function MapMode({
 
       {/* Passenger Type */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+          <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
             <span className="text-lg">👤</span> Passenger
           </label>
           <div className="grid grid-cols-2 gap-3">

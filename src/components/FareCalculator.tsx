@@ -6,6 +6,7 @@ import Header from './Header';
 import ModeToggle from './ModeToggle';
 import RouteMode from './RouteMode';
 import FareResult from './FareResult';
+import toast from 'react-hot-toast';
 
 const MapMode = dynamic(() => import('./MapMode'), {
   ssr: false,
@@ -76,13 +77,6 @@ export default function FareCalculator() {
                 onCalculate={setMapResult}
                 onError={setError}
               />
-            )}
-
-            {state.error && (
-              <div className="mt-5 p-4 bg-red-50 border-2 border-red-200 rounded-2xl text-red-700 text-sm font-semibold animate-slide-up flex items-start gap-3">
-                <span className="text-xl">⚠️</span>
-                <span className="flex-1">{state.error}</span>
-              </div>
             )}
 
             {state.result && <FareResult result={state.result} />}

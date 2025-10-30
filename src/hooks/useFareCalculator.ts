@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { CalculatorState, CalculationMode, PassengerType, FareCalculation } from '../lib/types';
 import { findRoute, normalizeName, midsayapProper } from '../lib/routeData';
 import { getFareByGasPrice } from '../lib/fareCalculations';
+import toast from 'react-hot-toast';
 
 export function useFareCalculator() {
   const [state, setState] = useState<CalculatorState>({
@@ -12,19 +13,18 @@ export function useFareCalculator() {
     passengerType: 'student',
     hasBaggage: false,
     result: null,
-    error: null
   });
 
   const setMode = useCallback((mode: CalculationMode) => {
-    setState(prev => ({ ...prev, mode, result: null, error: null }));
+    setState(prev => ({ ...prev, mode, result: null }));
   }, []);
 
   const setOrigin = useCallback((origin: string) => {
-    setState(prev => ({ ...prev, origin, destination: '', error: null }));
+    setState(prev => ({ ...prev, origin, destination: '' }));
   }, []);
 
   const setDestination = useCallback((destination: string) => {
-    setState(prev => ({ ...prev, destination, error: null }));
+    setState(prev => ({ ...prev, destination }));
   }, []);
 
   const setGasPrice = useCallback((gasPrice: number) => {
@@ -44,20 +44,14 @@ export function useFareCalculator() {
 
     // Validation
     if (!origin || !destination) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Please select both origin and destination',
-        result: null 
-      }));
+      toast.error('Please select both origin and destination');
+      setState(prev => ({ ...prev, result: null }));
       return;
     }
 
     if (origin === destination) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Origin and destination cannot be the same',
-        result: null 
-      }));
+      toast.error('Origin and destination cannot be the same');
+      setState(prev => ({ ...prev, result: null }));
       return;
     }
 
@@ -82,16 +76,13 @@ export function useFareCalculator() {
         hasBaggage
       };
 
-      setState(prev => ({ ...prev, result, error: null }));
+      setState(prev => ({ ...prev, result }));
       return;
     }
 
     if (!route) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Route not found. Please use Map mode for custom routes.',
-        result: null 
-      }));
+      toast.error('Route not found. Please use Map mode for custom routes.');
+      setState(prev => ({ ...prev, result: null }));
       return;
     }
 
@@ -111,15 +102,11 @@ export function useFareCalculator() {
       hasBaggage
     };
 
-    setState(prev => ({ ...prev, result, error: null }));
+    setState(prev => ({ ...prev, result }));
   }, [state]);
 
   const setMapResult = useCallback((result: FareCalculation) => {
-    setState(prev => ({ ...prev, result, error: null }));
-  }, []);
-
-  const setError = useCallback((error: string) => {
-    setState(prev => ({ ...prev, error, result: null }));
+    setState(prev => ({ ...prev, result }));
   }, []);
 
   const reset = useCallback(() => {
@@ -131,7 +118,6 @@ export function useFareCalculator() {
       passengerType: 'student',
       hasBaggage: false,
       result: null,
-      error: null
     }));
   }, []);
 
@@ -145,7 +131,6 @@ export function useFareCalculator() {
     setHasBaggage,
     calculateFare,
     setMapResult,
-    setError,
     reset
   };
 }

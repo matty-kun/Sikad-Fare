@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: "Sikad Fare Calculator - Midsayap",
@@ -26,6 +27,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <Toaster />
         {children}
       </body>
     </html>
