@@ -26,9 +26,10 @@ export default function RootLayout({
           crossOrigin=""
         />
       </head>
-      <body className="antialiased">
-        <Toaster />
+      <body>
         {children}
+        <Toaster position="top-center" />
+        <script src="../../node_modules/flowbite/dist/flowbite.min.js"></script>
       </body>
     </html>
   );

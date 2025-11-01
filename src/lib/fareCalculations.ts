@@ -20,9 +20,10 @@ export function getFareByGasPrice(
   passengerType: PassengerType
 ): number {
   const multiplier = getFareMultiplier(gasPrice);
-  return passengerType === 'student' 
+  const fare = passengerType.type === 'student' 
     ? baseStudent * multiplier 
     : baseRegular * multiplier;
+  return fare * passengerType.quantity;
 }
 
 // Haversine distance formula (returns km)
@@ -76,8 +77,8 @@ export function calculateMapFare(
   if (estimatedRoadDistKm < 1) {
     const baseMinRegular = 15.00;
     const baseMinStudent = 12.00;
-    regularFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'regular');
-    studentFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, 'student');
+    regularFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, { type: 'regular', quantity: 1 });
+    studentFare = getFareByGasPrice(gasPrice, baseMinRegular, baseMinStudent, { type: 'student', quantity: 1 });
   } else {
     regularFare = estimatedRoadDistKm * ratePerKm;
     studentFare = regularFare * 0.8;
@@ -96,7 +97,7 @@ export function calculateMapFare(
     studentFare += 10;
   }
   
-  const fare = passengerType === 'student' ? studentFare : regularFare;
+  const fare = passengerType.type === 'student' ? studentFare * passengerType.quantity : regularFare * passengerType.quantity;
   
   return {
     fare,

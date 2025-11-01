@@ -10,7 +10,10 @@ export interface RouteMatrix {
   [key: string]: Route;
 }
 
-export type PassengerType = 'student' | 'regular';
+export type PassengerType = {
+  type: 'student' | 'regular';
+  quantity: number;
+};
 
 export type CalculationMode = 'route' | 'map';
 

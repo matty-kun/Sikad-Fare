@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback } from 'react';
 import { CalculatorState, CalculationMode, PassengerType, FareCalculation } from '../lib/types';
 import { findRoute, normalizeName, midsayapProper } from '../lib/routeData';
@@ -10,9 +12,10 @@ export function useFareCalculator() {
     origin: '',
     destination: '',
     gasPrice: 60,
-    passengerType: 'student',
+    passengerType: { type: 'student', quantity: 1 },
     hasBaggage: false,
     result: null,
+    error: null,
   });
 
   const setMode = useCallback((mode: CalculationMode) => {
@@ -31,8 +34,8 @@ export function useFareCalculator() {
     setState(prev => ({ ...prev, gasPrice }));
   }, []);
 
-  const setPassengerType = useCallback((passengerType: PassengerType) => {
-    setState(prev => ({ ...prev, passengerType }));
+  const setPassengerType = useCallback((passengerType: Partial<PassengerType>) => {
+    setState(prev => ({ ...prev, passengerType: { ...prev.passengerType, ...passengerType } }));
   }, []);
 
   const setHasBaggage = useCallback((hasBaggage: boolean) => {
@@ -109,15 +112,20 @@ export function useFareCalculator() {
     setState(prev => ({ ...prev, result }));
   }, []);
 
+  const setError = useCallback((error: string) => {
+    toast.error(error);
+  }, []);
+
   const reset = useCallback(() => {
     setState(prev => ({
       ...prev,
       origin: '',
       destination: '',
       gasPrice: 60,
-      passengerType: 'student',
+      passengerType: { type: 'student', quantity: 1 },
       hasBaggage: false,
       result: null,
+      error: null,
     }));
   }, []);
 
@@ -131,6 +139,7 @@ export function useFareCalculator() {
     setHasBaggage,
     calculateFare,
     setMapResult,
-    reset
+    reset,
+    setError
   };
 }
