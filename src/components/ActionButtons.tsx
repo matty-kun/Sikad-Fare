@@ -11,7 +11,7 @@ export default function ActionButtons({ onCalculate, isCalculateDisabled = false
       <button
         onClick={onCalculate}
         disabled={isCalculateDisabled}
-        className="w-full py-3 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-800 active:scale-[0.98] transition-all shadow-md shadow-black/20 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="w-full py-5 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-800 active:scale-[0.98] transition-all shadow-md shadow-black/20 disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
         Calculate Fare
       </button>

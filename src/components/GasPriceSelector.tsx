@@ -53,7 +53,7 @@ export default function GasPriceSelector({ gasPrice, onChange }: GasPriceSelecto
       <select
         value={gasPrice}
         onChange={handleChange}
-        className="w-full p-2 text-xs font-semibold border-2 border-gray-200 rounded-lg bg-gray-50 appearance-none focus:outline-none focus:border-black focus:ring-4 focus:ring-black/10 transition-all"
+        className="w-full p-2 text-xs font-semibold border-2 border-gray-200 rounded-lg bg-gray-50 appearance-none focus:outline-none focus:border-black focus:ring-4 focus:ring-black/10 transition-all h-12"
       >
         {gasPriceOptions.map((option) => (
           <option key={option.value} value={option.value}>

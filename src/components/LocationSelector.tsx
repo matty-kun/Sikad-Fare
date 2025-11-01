@@ -34,7 +34,7 @@ export default function LocationSelector({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full p-2 text-xs font-semibold border-2 border-gray-200 rounded-lg bg-gray-50 appearance-none focus:outline-none focus:border-black focus:ring-4 focus:ring-black/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full p-2 text-xs font-semibold border-2 border-gray-200 rounded-lg bg-gray-50 appearance-none focus:outline-none focus:border-black focus:ring-4 focus:ring-black/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed h-12"
         >
           <option value="">{placeholder}</option>
           {withinTownOptions.length > 0 && <optgroup label="🏘️ Within Town">{withinTownOptions.map(p => <option key={p} value={p}>{p}</option>)}</optgroup>}
